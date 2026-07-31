@@ -24,6 +24,9 @@ public class UserResponseDTO {
     }
 
     public UserResponseDTO(int id, String username, Role role) {
+        this.id = id;
+        this.username = username;
+        this.role = role;
     }
 
     public static UserResponseDTO fromUser(User user) {

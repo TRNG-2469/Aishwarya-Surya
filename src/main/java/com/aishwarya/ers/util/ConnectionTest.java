@@ -13,7 +13,7 @@ public class ConnectionTest {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            e.getMessage();
         }
     }
 }

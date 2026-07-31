@@ -4,10 +4,7 @@ import com.aishwarya.ers.model.Role;
 import com.aishwarya.ers.model.User;
 import com.aishwarya.ers.util.ConnectionFactory;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,19 +13,30 @@ public class UserRepository {
     public boolean createUser(User user) {
 
         String sql = """
-                INSERT INTO users (username, password_hash, role, department)
-                VALUES (?, ?, ?, ?)
-                """;
+            INSERT INTO users (username, password_hash, role, department)
+            VALUES (?, ?, ?, ?)
+            """;
 
         try (Connection connection = ConnectionFactory.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
+             PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             statement.setString(1, user.getUsername());
             statement.setString(2, user.getPasswordHash());
             statement.setString(3, user.getRole().name());
             statement.setString(4, user.getDepartment());
 
-            return statement.executeUpdate() == 1;
+            int rowsAffected = statement.executeUpdate();
+            if (rowsAffected != 1) {
+                return false;
+            }
+
+            try (ResultSet keys = statement.getGeneratedKeys()) {
+                if (keys.next()) {
+                    user.setId(keys.getInt(1));
+                }
+            }
+
+            return true;
 
         } catch (SQLException e) {
             e.printStackTrace();
