@@ -1,4 +1,8 @@
 package com.aishwarya.ers.model;
 
-public class ReimbursementType {
+public enum ReimbursementType {
+    TRAVEL,
+    LODGING,
+    MEALS,
+    OTHER
 }

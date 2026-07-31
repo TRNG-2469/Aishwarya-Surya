@@ -1,4 +1,6 @@
 package com.aishwarya.ers.model;
 
-public class Role {
+public enum Role {
+    EMPLOYEE,
+    MANAGER
 }

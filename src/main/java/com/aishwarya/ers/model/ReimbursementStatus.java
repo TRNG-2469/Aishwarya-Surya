@@ -1,4 +1,8 @@
 package com.aishwarya.ers.model;
 
-public class ReimbursementStatus {
+public enum ReimbursementStatus {
+    PENDING,
+    APPROVED,
+    DENIED
+
 }
