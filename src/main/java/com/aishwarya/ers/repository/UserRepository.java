@@ -8,6 +8,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UserRepository {
 
@@ -86,6 +88,77 @@ public class UserRepository {
         }
 
         return null;
+    }
+
+    public List<User> findAll() {
+
+        String sql = """
+                SELECT id, username, password_hash, role, department
+                FROM users
+                """;
+
+        List<User> users = new ArrayList<>();
+
+        try (Connection connection = ConnectionFactory.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+
+                while (resultSet.next()) {
+                    users.add(mapRow(resultSet));
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return users;
+    }
+
+    public boolean update(User user) {
+
+        String sql = """
+                UPDATE users
+                SET username = ?, password_hash = ?, role = ?, department = ?
+                WHERE id = ?
+                """;
+
+        try (Connection connection = ConnectionFactory.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setString(1, user.getUsername());
+            statement.setString(2, user.getPasswordHash());
+            statement.setString(3, user.getRole().name());
+            statement.setString(4, user.getDepartment());
+            statement.setInt(5, user.getId());
+
+            return statement.executeUpdate() == 1;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean delete(int id) {
+
+        String sql = """
+                DELETE FROM users
+                WHERE id = ?
+                """;
+
+        try (Connection connection = ConnectionFactory.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setInt(1, id);
+
+            return statement.executeUpdate() == 1;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     private User mapRow(ResultSet resultSet) throws SQLException {
