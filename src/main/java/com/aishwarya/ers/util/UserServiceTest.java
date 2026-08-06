@@ -13,8 +13,10 @@ public class UserServiceTest {
 
         UserService userService = new UserService(new UserRepository());
 
+        String username = "Bob" + System.currentTimeMillis();
+
         User newUser = new User();
-        newUser.setUsername("Bob");
+        newUser.setUsername(username);
         newUser.setDepartment("HR");
 
         UserResponseDTO registered = userService.register(newUser, "password123");
@@ -23,7 +25,7 @@ public class UserServiceTest {
         UserResponseDTO byId = userService.getUserById(registered.getId());
         System.out.println("Found by id: " + byId.getUsername());
 
-        UserResponseDTO byUsername = userService.getUserByUsername("testuser2");
+        UserResponseDTO byUsername = userService.getUserByUsername(username);
         System.out.println("Found by username: " + byUsername.getUsername());
 
         List<UserResponseDTO> all = userService.getAllUsers();

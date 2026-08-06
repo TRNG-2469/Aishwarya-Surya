@@ -6,43 +6,43 @@ import com.aishwarya.ers.model.User;
 public class UserResponseDTO {
     private int id;
     private String username;
-    private String firstName;
-    private String lastName;
-    private String email;
+    private String department;
     private Role role;
 
-    public UserResponseDTO() {}
+    public UserResponseDTO() {
 
-    public UserResponseDTO(int id, String username, String firstName,
-                           String lastName, String email, Role role) {
+    }
+
+    public UserResponseDTO(int id, String username, String department, Role role) {
         this.id = id;
         this.username = username;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
+        this.department = department;
         this.role = role;
     }
 
-    public UserResponseDTO(int id, String username, Role role) {
-        this.id = id;
-        this.username = username;
-        this.role = role;
-    }
 
     public static UserResponseDTO fromUser(User user) {
         return new UserResponseDTO(
                 user.getId(),
                 user.getUsername(),
+                user.getDepartment(),
                 user.getRole()
         );
     }
 
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    public int getId() {
+        return id;
+    }
 
-    public String getUsername() { return username; }
-    public void setUsername(String username) { this.username = username; }
+    public String getUsername() {
+        return username;
+    }
 
-    public Role getRole() { return role; }
-    public void setRole(Role role) { this.role = role; }
+    public String getDepartment() {
+        return department;
+    }
+
+    public Role getRole() {
+        return role;
+    }
 }
