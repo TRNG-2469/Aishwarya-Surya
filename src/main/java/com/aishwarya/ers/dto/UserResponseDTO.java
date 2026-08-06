@@ -8,18 +8,16 @@ public class UserResponseDTO {
     private String username;
     private String firstName;
     private String lastName;
-    private String email;
     private Role role;
 
     public UserResponseDTO() {}
 
     public UserResponseDTO(int id, String username, String firstName,
-                           String lastName, String email, Role role) {
+                           String lastName, Role role) {
         this.id = id;
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.email = email;
         this.role = role;
     }
 
