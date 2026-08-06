@@ -4,14 +4,20 @@ import com.aishwarya.ers.model.Reimbursement;
 import com.aishwarya.ers.model.ReimbursementStatus;
 import com.aishwarya.ers.repository.ReimbursementRepository;
 
+import com.aishwarya.ers.model.Role;
+import com.aishwarya.ers.model.User;
+import com.aishwarya.ers.repository.UserRepository;
+
 import java.util.List;
 
 public class ReimbursementService {
 
     private final ReimbursementRepository repo;
+    private final UserRepository userRepo;
 
-    public ReimbursementService(ReimbursementRepository repo) {
+    public ReimbursementService(ReimbursementRepository repo, UserRepository userRepo) {
         this.repo = repo;
+        this.userRepo = userRepo;
     }
 
     public Reimbursement submit(Reimbursement r) {
@@ -54,6 +60,19 @@ public class ReimbursementService {
     }
 
     private void resolve(int id, ReimbursementStatus status, int resolverId, String action) {
+
+        User resolver = userRepo.findById(resolverId);
+
+        if (resolver == null) {
+            throw new RuntimeException("No user with id " + resolverId);
+        }
+
+        if (resolver.getRole() != Role.MANAGER) {
+            throw new RuntimeException(
+                    "User " + resolverId + " is not a Manager and cannot " + action + " reimbursements"
+            );
+        }
+
         if (!repo.resolve(id, status, resolverId))
             throw new RuntimeException("Could not " + action + " reimbursement with id " + id
                     + " (it may not exist or is no longer pending)");

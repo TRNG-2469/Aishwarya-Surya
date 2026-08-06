@@ -17,11 +17,17 @@ public class ReimbursementServiceTest {
 
         UserRepository userRepository = new UserRepository();
         ReimbursementService reimbursementService =
-                new ReimbursementService(new ReimbursementRepository());
+                new ReimbursementService(new ReimbursementRepository(), userRepository);
 
         User user = userRepository.findByUsername("testuser1");
         if (user == null) {
             System.out.println("Test user was not found.");
+            return;
+        }
+
+        User manager = userRepository.findByUsername("testmanager1");
+        if (manager == null) {
+            System.out.println("Test manager was not found.");
             return;
         }
 
@@ -41,7 +47,7 @@ public class ReimbursementServiceTest {
         Reimbursement updated = reimbursementService.updatePending(found);
         System.out.println("Updated description: " + updated.getDescription());
 
-        reimbursementService.approve(submitted.getId(), user.getId());
+        reimbursementService.approve(submitted.getId(), manager.getId());
         Reimbursement resolved = reimbursementService.getById(submitted.getId());
         System.out.println("Status after approve: " + resolved.getStatus());
 
@@ -51,6 +57,13 @@ public class ReimbursementServiceTest {
             System.out.println("ERROR: updated a resolved reimbursement");
         } catch (RuntimeException e) {
             System.out.println("Confirmed resolved requests can't be edited: " + e.getMessage());
+        }
+
+        try {
+            reimbursementService.approve(submitted.getId(), user.getId());
+            System.out.println("ERROR: a non-manager was able to approve");
+        } catch (RuntimeException e) {
+            System.out.println("Confirmed non-managers can't approve: " + e.getMessage());
         }
 
         List<Reimbursement> userReimbursements = reimbursementService.getByUserId(user.getId());
