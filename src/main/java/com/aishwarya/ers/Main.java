@@ -24,6 +24,40 @@ public class Main {
         UserController userController = new UserController(userService);
         ReimbursementController reimbursementController = new ReimbursementController(reimbursementService);
 
+        // 1. Launch web server first
+        ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
+        Javalin app = Javalin.create(config -> config.jsonMapper(new JavalinJackson(mapper, true))).start(8080);
+
+        app.get("/", ctx -> ctx.result("ERS API is running"));
+
+        app.post("/api/users/register", userController::register);
+        app.get("/api/users", userController::getAllUsers);
+        app.get("/api/users/{id}", userController::getUserById);
+        app.put("/api/users/{id}", userController::updateUser);
+        app.delete("/api/users/{id}", userController::deleteUser);
+
+        app.post("/api/reimbursements", reimbursementController::submit);
+        app.get("/api/reimbursements", reimbursementController::getAll);
+        app.get("/api/reimbursements/{id}", reimbursementController::getById);
+        app.get("/api/reimbursements/user/{userId}", reimbursementController::getByUserId);
+        app.get("/api/reimbursements/status/{status}", reimbursementController::getByStatus);
+        app.put("/api/reimbursements/{id}", reimbursementController::updatePending);
+        app.patch("/api/reimbursements/{id}/approve", reimbursementController::approve);
+        app.patch("/api/reimbursements/{id}/deny", reimbursementController::deny);
+
+        app.exception(Exception.class, (e, ctx) -> {
+            e.printStackTrace();
+            if (e instanceof RuntimeException) {
+                ctx.status(400);
+                String msg = e.getMessage() != null ? e.getMessage() : "Invalid request.";
+                ctx.json(new ErrorResponse(msg));
+            } else {
+                ctx.status(500);
+                ctx.json(new ErrorResponse("An unexpected server error occurred."));
+            }
+        });
+
+        // 2. Launch CLI prompt after web server is active
         try (Scanner scanner = new Scanner(System.in)) {
             System.out.println("Please enter your username:");
             String username = scanner.nextLine();
@@ -71,37 +105,5 @@ public class Main {
             System.err.println("An unexpected error occurred: " + e.getMessage());
             e.printStackTrace();
         }
-
-        ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
-        Javalin app = Javalin.create(config -> config.jsonMapper(new JavalinJackson(mapper, true))).start(8080);
-
-        app.get("/", ctx -> ctx.result("ERS API is running"));
-
-        app.post("/api/users/register", userController::register);
-        app.get("/api/users", userController::getAllUsers);
-        app.get("/api/users/{id}", userController::getUserById);
-        app.put("/api/users/{id}", userController::updateUser);
-        app.delete("/api/users/{id}", userController::deleteUser);
-
-        app.post("/api/reimbursements", reimbursementController::submit);
-        app.get("/api/reimbursements", reimbursementController::getAll);
-        app.get("/api/reimbursements/{id}", reimbursementController::getById);
-        app.get("/api/reimbursements/user/{userId}", reimbursementController::getByUserId);
-        app.get("/api/reimbursements/status/{status}", reimbursementController::getByStatus);
-        app.put("/api/reimbursements/{id}", reimbursementController::updatePending);
-        app.patch("/api/reimbursements/{id}/approve", reimbursementController::approve);
-        app.patch("/api/reimbursements/{id}/deny", reimbursementController::deny);
-
-        app.exception(Exception.class, (e, ctx) -> {
-            e.printStackTrace();
-            if (e instanceof RuntimeException) {
-                ctx.status(400);
-                String msg = e.getMessage() != null ? e.getMessage() : "Invalid request.";
-                ctx.json(new ErrorResponse(msg));
-            } else {
-                ctx.status(500);
-                ctx.json(new ErrorResponse("An unexpected server error occurred."));
-            }
-        });
     }
 }
