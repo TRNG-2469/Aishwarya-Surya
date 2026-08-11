@@ -4,7 +4,7 @@ public class User {
 
     private int id;
     private String username;
-    private String passwordHash;
+    private String password;
     private Role role;
     private String department;
 
@@ -13,10 +13,10 @@ public class User {
     public User() {
     }
 
-    public User(int id, String username, String passwordHash, Role role, String department) {
+    public User(int id, String username, String password, Role role, String department) {
         this.id = id;
         this.username = username;
-        this.passwordHash = passwordHash;
+        this.password = password;
         this.role = role;
         this.department = department;
     }
@@ -30,7 +30,7 @@ public class User {
     }
 
     public String getPasswordHash() {
-        return passwordHash;
+        return password;
     }
 
     public Role getRole() {
@@ -50,7 +50,7 @@ public class User {
     }
 
     public void setPasswordHash(String passwordHash) {
-        this.passwordHash = passwordHash;
+        this.password = passwordHash;
     }
 
     public void setRole(Role role) {
