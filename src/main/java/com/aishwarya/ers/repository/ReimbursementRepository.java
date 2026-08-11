@@ -248,14 +248,9 @@ public class ReimbursementRepository {
         }
 
         Timestamp createdAt = resultSet.getTimestamp("created_at");
-        Timestamp resolvedAt = resultSet.getTimestamp("resolved_at");
 
         if (createdAt != null) {
             reimbursement.setCreatedAt(createdAt.toLocalDateTime());
-        }
-
-        if (resolvedAt != null) {
-            reimbursement.setResolvedAt(resolvedAt.toLocalDateTime());
         }
 
         return reimbursement;

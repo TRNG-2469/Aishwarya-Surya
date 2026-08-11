@@ -13,15 +13,13 @@ public class Reimbursement {
     private ReimbursementStatus status;
     private Integer resolverId;
     private LocalDateTime createdAt;
-    private LocalDateTime resolvedAt;
 
     public Reimbursement() {
     }
 
     public Reimbursement(int id, int userId, BigDecimal amount, String description,
                          ReimbursementType type, ReimbursementStatus status,
-                         Integer resolverId, LocalDateTime createdAt,
-                         LocalDateTime resolvedAt) {
+                         Integer resolverId, LocalDateTime createdAt) {
         this.id = id;
         this.userId = userId;
         this.amount = amount;
@@ -30,7 +28,6 @@ public class Reimbursement {
         this.status = status;
         this.resolverId = resolverId;
         this.createdAt = createdAt;
-        this.resolvedAt = resolvedAt;
     }
 
     public int getId() {
@@ -97,11 +94,4 @@ public class Reimbursement {
         this.createdAt = createdAt;
     }
 
-    public LocalDateTime getResolvedAt() {
-        return resolvedAt;
-    }
-
-    public void setResolvedAt(LocalDateTime resolvedAt) {
-        this.resolvedAt = resolvedAt;
-    }
 }
