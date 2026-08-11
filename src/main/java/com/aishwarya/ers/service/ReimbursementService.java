@@ -19,7 +19,7 @@ public class ReimbursementService {
         this.repo = repo;
         this.userRepo = userRepo;
     }
-
+w
     public Reimbursement submit(Reimbursement r) {
         r.setStatus(ReimbursementStatus.PENDING);
         if (!repo.create(r)) throw new RuntimeException("Failed to create reimbursement request");
@@ -42,6 +42,10 @@ public class ReimbursementService {
 
     public List<Reimbursement> getByStatus(ReimbursementStatus status) {
         return repo.findByStatus(status);
+    }
+
+    public List<Reimbursement> getByFilters(ReimbursementStatus status, String department) {
+        return repo.findByFilters(status, department);
     }
 
     public Reimbursement updatePending(Reimbursement r) {

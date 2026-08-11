@@ -37,7 +37,7 @@ public class Main {
         app.delete("/api/users/{id}", userController::deleteUser);
 
         app.post("/api/reimbursements", reimbursementController::submit);
-        app.get("/api/reimbursements", reimbursementController::getAll);
+        app.get("/api/reimbursements", reimbursementController::getFiltered);
         app.get("/api/reimbursements/{id}", reimbursementController::getById);
         app.get("/api/reimbursements/user/{userId}", reimbursementController::getByUserId);
         app.get("/api/reimbursements/status/{status}", reimbursementController::getByStatus);

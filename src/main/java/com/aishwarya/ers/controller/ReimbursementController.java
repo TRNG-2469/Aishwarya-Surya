@@ -22,8 +22,15 @@ public class ReimbursementController {
         ctx.json(created);
     }
 
-    public void getAll(Context ctx) {
-        List<Reimbursement> reimbursements = service.getAll();
+    public void getFiltered(Context ctx) {
+        String statusParam = ctx.queryParam("status");
+        String department = ctx.queryParam("department");
+
+        ReimbursementStatus status = statusParam != null
+                ? ReimbursementStatus.valueOf(statusParam.toUpperCase())
+                : null;
+
+        List<Reimbursement> reimbursements = service.getByFilters(status, department);
         ctx.json(reimbursements);
     }
 

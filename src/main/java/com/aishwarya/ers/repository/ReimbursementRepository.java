@@ -260,4 +260,51 @@ public class ReimbursementRepository {
 
         return reimbursement;
     }
+
+    public List<Reimbursement> findByFilters(ReimbursementStatus status, String department) {
+
+        StringBuilder sql = new StringBuilder("""
+            SELECT r.id, r.user_id, r.amount, r.description, r.type, r.status,
+                   r.resolver_id, r.created_at, r.resolved_at
+            FROM reimbursements r
+            JOIN users u ON r.user_id = u.id
+            WHERE 1=1
+            """);
+
+        List<String> params = new ArrayList<>();
+
+        if (status != null) {
+            sql.append(" AND r.status = ?");
+            params.add(status.name());
+        }
+
+        if (department != null) {
+            sql.append(" AND u.department = ?");
+            params.add(department);
+        }
+
+        sql.append(" ORDER BY r.created_at DESC");
+
+        List<Reimbursement> reimbursements = new ArrayList<>();
+
+        try (Connection connection = ConnectionFactory.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql.toString())) {
+
+            for (int i = 0; i < params.size(); i++) {
+                statement.setString(i + 1, params.get(i));
+            }
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    reimbursements.add(mapRow(resultSet));
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return reimbursements;
+    }
+
 }
