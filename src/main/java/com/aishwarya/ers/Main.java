@@ -13,6 +13,8 @@ import io.javalin.Javalin;
 import io.javalin.json.JavalinJackson;
 import org.mindrot.jbcrypt.BCrypt;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Scanner;
@@ -28,10 +30,18 @@ public class Main {
         ReimbursementController reimbursementController = new ReimbursementController(reimbursementService);
 
         ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
-        Javalin app = Javalin.create(config -> config.jsonMapper(new JavalinJackson(mapper, true))).start(8080);
+        Javalin app = Javalin.create(config -> {
+            config.jsonMapper(new JavalinJackson(mapper, true));
+        }).start(8080);
 
-        app.get("/", ctx -> ctx.result("ERS API is running"));
-
+        app.get("/", ctx -> {
+            String html = Files.readString(Paths.get("index.html"));
+            ctx.html(html);
+        });
+        app.get("/style.css", ctx -> {
+            ctx.contentType("text/css");
+            ctx.result(Files.readString(Paths.get("style.css")));
+        });
         app.post("/api/users/register", userController::register);
         app.get("/api/users", userController::getAllUsers);
         app.get("/api/users/{id}", userController::getUserById);
