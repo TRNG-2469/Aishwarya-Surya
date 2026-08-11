@@ -45,6 +45,12 @@ public class Main {
         app.patch("/api/reimbursements/{id}/approve", reimbursementController::approve);
         app.patch("/api/reimbursements/{id}/deny", reimbursementController::deny);
 
+
+        app.exception(UserNotFoundException.class, (e, ctx) -> {
+            ctx.status(404);
+            ctx.json(new ErrorResponse(e.getMessage()));
+        });
+
         app.exception(Exception.class, (e, ctx) -> {
             e.printStackTrace();
             if (e instanceof RuntimeException) {
@@ -57,7 +63,6 @@ public class Main {
             }
         });
 
-        // 2. Launch CLI prompt after web server is active
         try (Scanner scanner = new Scanner(System.in)) {
             System.out.println("Please enter your username:");
             String username = scanner.nextLine();

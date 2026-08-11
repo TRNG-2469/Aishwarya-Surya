@@ -18,6 +18,14 @@ public class UserService {
         this.repo = repo;
     }
 
+    private User findOrThrow(int id) {
+        User user = repo.findById(id);
+        if (user == null) {
+            throw new UserNotFoundException(id);
+        }
+        return user;
+    }
+
     public UserResponseDTO register(User user, String plainPassword) {
         if (repo.findByUsername(user.getUsername()) != null)
             throw new RuntimeException("Username already taken: " + user.getUsername());
@@ -34,9 +42,7 @@ public class UserService {
     }
 
     public UserResponseDTO getUserById(int id) {
-        User user = repo.findById(id);
-        if (user == null) throw new RuntimeException("No user with id " + id);
-        return UserResponseDTO.fromUser(user);
+        return UserResponseDTO.fromUser(findOrThrow(id));
     }
 
     public UserResponseDTO getUserByUsername(String username) {
@@ -52,15 +58,11 @@ public class UserService {
     }
 
     public Role getRole(int id) {
-        User user = repo.findById(id);
-        if (user == null) throw new RuntimeException("No user with id " + id);
-        return user.getRole();
+        return findOrThrow(id).getRole();
     }
 
     public String getDepartment(int id) {
-        User user = repo.findById(id);
-        if (user == null) throw new RuntimeException("No user with id " + id);
-        return user.getDepartment();
+        return findOrThrow(id).getDepartment();
     }
 
     public UserResponseDTO updateUser(int id, User updatedFields, String newPlainPassword) {
@@ -78,6 +80,10 @@ public class UserService {
     }
 
     public void deleteUser(int id) {
-        if (!repo.delete(id)) throw new RuntimeException("No user with id " + id);
+        findOrThrow(id);
+        if (!repo.delete(id)) {
+            throw new RuntimeException("Failed to delete user with id " + id);
+        }
     }
+
 }
