@@ -33,8 +33,6 @@ public class Main {
         app.post("/api/users/register", userController::register);
         app.get("/api/users", userController::getAllUsers);
         app.get("/api/users/{id}", userController::getUserById);
-        app.put("/api/users/{id}", userController::updateUser);
-        app.delete("/api/users/{id}", userController::deleteUser);
 
         app.post("/api/reimbursements", reimbursementController::submit);
         app.get("/api/reimbursements", reimbursementController::getFiltered);
