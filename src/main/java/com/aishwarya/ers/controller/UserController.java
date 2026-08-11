@@ -51,14 +51,6 @@ public class UserController {
         ctx.json(updated);
     }
 
-    public void deleteUser(Context ctx) {
-        int id = Integer.parseInt(ctx.pathParam("id"));
-        service.deleteUser(id);
-        ctx.status(204);
-    }
-
-    // Small request-shaping classes so raw passwords never land
-    // directly on the User model (which only stores passwordHash).
     public static class RegisterRequest {
         public String username;
         public String password;
