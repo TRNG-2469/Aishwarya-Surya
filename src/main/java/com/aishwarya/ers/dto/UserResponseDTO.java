@@ -6,16 +6,16 @@ import com.aishwarya.ers.model.User;
 public class UserResponseDTO {
     private int id;
     private String username;
-    private String firstName;
-    private String lastName;
+    private String department;
     private Role role;
 
-    public UserResponseDTO(int id, String username, String firstName,
-                           String lastName, Role role) {
+    public UserResponseDTO() {
+    }
+
+    public UserResponseDTO(int id, String username, String department, Role role) {
         this.id = id;
         this.username = username;
-        this.firstName = firstName;
-        this.lastName = lastName;
+        this.department = department;
         this.role = role;
     }
 
@@ -23,8 +23,7 @@ public class UserResponseDTO {
         return new UserResponseDTO(
                 user.getId(),
                 user.getUsername(),
-                user.getFirstName(),
-                user.getLastName(),
+                user.getDepartment(),
                 user.getRole()
         );
     }
@@ -37,12 +36,8 @@ public class UserResponseDTO {
         return username;
     }
 
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
+    public String getDepartment() {
+        return department;
     }
 
     public Role getRole() {
