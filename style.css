@@ -1,6 +1,31 @@
-form {
+body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
+
+#authForm {
     display: flex;
     flex-direction: column;
     width: 300px;
-    gap: 10px;
+    gap: 12px;
+    padding: 20px;
+    border: 1pt solid black;
+    box-sizing: border-box;
+}
+
+#authForm label {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+#authForm input,
+#authForm button {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 6px;
 }
