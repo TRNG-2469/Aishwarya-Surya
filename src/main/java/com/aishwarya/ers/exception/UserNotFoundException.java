@@ -1,4 +1,4 @@
-package com.aishwarya.ers.service;
+package com.aishwarya.ers.exception;
 
 public class UserNotFoundException extends RuntimeException {
     public UserNotFoundException(String message) {

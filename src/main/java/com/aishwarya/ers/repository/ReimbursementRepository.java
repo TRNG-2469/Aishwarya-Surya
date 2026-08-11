@@ -107,7 +107,7 @@ public class ReimbursementRepository {
         return reimbursements;
     }
 
-    public List<Reimbursement> findAll() {
+    public static List<Reimbursement> findAll() {
 
         String sql = """
                 SELECT id, user_id, amount, description, type, status,
@@ -224,7 +224,7 @@ public class ReimbursementRepository {
         return false;
     }
 
-    private Reimbursement mapRow(ResultSet resultSet) throws SQLException {
+    private static Reimbursement mapRow(ResultSet resultSet) throws SQLException {
 
         Reimbursement reimbursement = new Reimbursement();
 

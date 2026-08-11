@@ -1,5 +1,6 @@
 package com.aishwarya.ers.service;
 
+import com.aishwarya.ers.exception.ForbiddenException;
 import com.aishwarya.ers.model.Reimbursement;
 import com.aishwarya.ers.model.ReimbursementStatus;
 import com.aishwarya.ers.repository.ReimbursementRepository;
@@ -7,6 +8,7 @@ import com.aishwarya.ers.repository.ReimbursementRepository;
 import com.aishwarya.ers.model.Role;
 import com.aishwarya.ers.model.User;
 import com.aishwarya.ers.repository.UserRepository;
+import io.javalin.http.Context;
 
 import java.util.List;
 
@@ -80,5 +82,17 @@ public class ReimbursementService {
         if (!repo.resolve(id, status, resolverId))
             throw new RuntimeException("Could not " + action + " reimbursement with id " + id
                     + " (it may not exist or is no longer pending)");
+    }
+
+    public List<Reimbursement> getAllReimbursements(User loggedInUser) {
+        if (loggedInUser == null) {
+            throw new IllegalArgumentException("User cannot be null");
+        }
+
+        if (loggedInUser.getRole() != Role.MANAGER) {
+            throw new ForbiddenException("Access Denied: Only Managers can view all reimbursements.");
+        }
+
+        return ReimbursementRepository.findAll();
     }
 }

@@ -2,6 +2,8 @@ package com.aishwarya.ers;
 
 import com.aishwarya.ers.controller.*;
 import com.aishwarya.ers.exception.ErrorResponse;
+import com.aishwarya.ers.exception.ForbiddenException;
+import com.aishwarya.ers.exception.UserNotFoundException;
 import com.aishwarya.ers.model.*;
 import com.aishwarya.ers.repository.*;
 import com.aishwarya.ers.service.*;
@@ -11,6 +13,7 @@ import io.javalin.Javalin;
 import io.javalin.json.JavalinJackson;
 import org.mindrot.jbcrypt.BCrypt;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.Scanner;
 
@@ -24,7 +27,6 @@ public class Main {
         UserController userController = new UserController(userService);
         ReimbursementController reimbursementController = new ReimbursementController(reimbursementService);
 
-        // 1. Launch web server first
         ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
         Javalin app = Javalin.create(config -> config.jsonMapper(new JavalinJackson(mapper, true))).start(8080);
 
@@ -46,6 +48,11 @@ public class Main {
 
         app.exception(UserNotFoundException.class, (e, ctx) -> {
             ctx.status(404);
+            ctx.json(new ErrorResponse(e.getMessage()));
+        });
+
+        app.exception(ForbiddenException.class, (e, ctx) -> {
+            ctx.status(403);
             ctx.json(new ErrorResponse(e.getMessage()));
         });
 

@@ -1,5 +1,6 @@
 package com.aishwarya.ers.service;
 
+import com.aishwarya.ers.exception.UserNotFoundException;
 import com.aishwarya.ers.model.Role;
 import com.aishwarya.ers.model.User;
 import com.aishwarya.ers.dto.UserResponseDTO;
