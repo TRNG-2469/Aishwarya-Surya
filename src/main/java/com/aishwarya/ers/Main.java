@@ -42,6 +42,10 @@ public class Main {
             ctx.contentType("text/css");
             ctx.result(Files.readString(Paths.get("style.css")));
         });
+        app.get("/script.js", ctx -> {
+            ctx.contentType("text/javascript");
+            ctx.result(Files.readString(Paths.get("script.js")));
+        });
         app.post("/api/users/register", userController::register);
         app.get("/api/users", userController::getAllUsers);
         app.get("/api/users/{id}", userController::getUserById);
