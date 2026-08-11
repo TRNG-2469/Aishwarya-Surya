@@ -8,11 +8,30 @@
 </head>
 <body>
 
+<h1 id="formTitle">Login</h1>
+
 <form id="authForm">
-    <label>Username: <input type="text" id="username" required></label>
-    <label>Password: <input type="password" id="password" required></label>
-    <button type="submit">Submit</button>
+    <!-- Basic Login Fields (Always Visible) -->
+    <input type="text" id="username" placeholder="Username" required>
+    <input type="password" id="password" placeholder="Password" required>
+
+    <!-- Hidden Registration Fields -->
+    <div id="registerFields" style="display: none;">
+        <input type="text" id="department" placeholder="Department (e.g. IT, Sales)">
+
+        <select id="role">
+            <option value="EMPLOYEE" selected>Employee</option>
+            <option value="MANAGER">Manager</option>
+            <option value="ADMIN">Admin</option>
+        </select>
+    </div>
+
+    <button type="submit" id="submitBtn">Login</button>
 </form>
+
+<p>
+    <a href="#" id="toggleRegister">Don't have an account? Register here</a>
+</p>
 
 <p id="msg"></p>
 

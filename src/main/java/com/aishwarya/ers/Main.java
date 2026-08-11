@@ -1,133 +1,64 @@
 package com.aishwarya.ers;
 
-import com.aishwarya.ers.controller.*;
-import com.aishwarya.ers.exception.ErrorResponse;
-import com.aishwarya.ers.exception.ForbiddenException;
-import com.aishwarya.ers.exception.UserNotFoundException;
-import com.aishwarya.ers.model.*;
-import com.aishwarya.ers.repository.*;
-import com.aishwarya.ers.service.*;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.aishwarya.ers.dto.UserResponseDTO;
+import com.aishwarya.ers.model.Role;
+import com.aishwarya.ers.model.User;
+import com.aishwarya.ers.repository.UserRepository;
+import com.aishwarya.ers.service.UserService;
 import io.javalin.Javalin;
-import io.javalin.json.JavalinJackson;
-import org.mindrot.jbcrypt.BCrypt;
-
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Scanner;
+import io.javalin.http.staticfiles.Location;
+import com.fasterxml.jackson.databind.JsonNode;
 
 public class Main {
-
     public static void main(String[] args) {
-        UserRepository userRepo = new UserRepository();
-        ReimbursementRepository reimbursementRepo = new ReimbursementRepository();
-        UserService userService = new UserService(userRepo);
-        ReimbursementService reimbursementService = new ReimbursementService(reimbursementRepo, userRepo);
-        UserController userController = new UserController(userService);
-        ReimbursementController reimbursementController = new ReimbursementController(reimbursementService);
 
-        ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
+        UserRepository repo = new UserRepository();
+        UserService userService = new UserService(repo);
+
         Javalin app = Javalin.create(config -> {
-            config.jsonMapper(new JavalinJackson(mapper, true));
-        }).start(8080);
-
-        app.get("/", ctx -> {
-            String html = Files.readString(Paths.get("index.html"));
-            ctx.html(html);
-        });
-        app.get("/style.css", ctx -> {
-            ctx.contentType("text/css");
-            ctx.result(Files.readString(Paths.get("style.css")));
-        });
-        app.get("/script.js", ctx -> {
-            ctx.contentType("text/javascript");
-            ctx.result(Files.readString(Paths.get("script.js")));
-        });
-        app.post("/api/users/register", userController::register);
-        app.get("/api/users", userController::getAllUsers);
-        app.get("/api/users/{id}", userController::getUserById);
-
-        app.post("/api/reimbursements", reimbursementController::submit);
-        app.get("/api/reimbursements", reimbursementController::getFiltered);
-        app.get("/api/reimbursements/{id}", reimbursementController::getById);
-        app.get("/api/reimbursements/user/{userId}", reimbursementController::getByUserId);
-        app.get("/api/reimbursements/status/{status}", reimbursementController::getByStatus);
-        app.put("/api/reimbursements/{id}", reimbursementController::updatePending);
-        app.patch("/api/reimbursements/{id}/approve", reimbursementController::approve);
-        app.patch("/api/reimbursements/{id}/deny", reimbursementController::deny);
-
-
-        app.exception(UserNotFoundException.class, (e, ctx) -> {
-            ctx.status(404);
-            ctx.json(new ErrorResponse(e.getMessage()));
+            // "." points to your project root folder on the file system
+            config.staticFiles.add(".", Location.EXTERNAL);
         });
 
-        app.exception(ForbiddenException.class, (e, ctx) -> {
-            ctx.status(403);
-            ctx.json(new ErrorResponse(e.getMessage()));
-        });
+        app.post("/", ctx -> {
+            JsonNode body = ctx.bodyAsClass(JsonNode.class);
 
-        app.exception(Exception.class, (e, ctx) -> {
-            e.printStackTrace();
-            if (e instanceof RuntimeException) {
-                ctx.status(400);
-                String msg = e.getMessage() != null ? e.getMessage() : "Invalid request.";
-                ctx.json(new ErrorResponse(msg));
-            } else {
-                ctx.status(500);
-                ctx.json(new ErrorResponse("An unexpected server error occurred."));
+            try {
+                String action = body.has("action") ? body.get("action").asText() : "";
+
+                if ("login".equalsIgnoreCase(action)) {
+                    String username = body.get("username").asText();
+                    String password = body.get("password").asText();
+
+                    UserResponseDTO user = userService.login(username, password);
+                    ctx.status(200).json(user);
+
+                } else if ("register".equalsIgnoreCase(action)) {
+                    User newUser = new User();
+                    newUser.setUsername(body.get("username").asText());
+                    if (body.has("department")) newUser.setDepartment(body.get("department").asText());
+                    if (body.has("role")) newUser.setRole(Role.valueOf(body.get("role").asText()));
+
+                    String plainPassword = body.get("password").asText();
+
+                    UserResponseDTO createdUser = userService.register(newUser, plainPassword);
+                    ctx.status(201).json(createdUser);
+
+                } else {
+                    // Triggers the 400 catch block below for invalid actions
+                    throw new IllegalArgumentException("Bad Request: Missing or invalid action");
+                }
+
+            } catch (IllegalArgumentException | NullPointerException e) {
+                // Single place for all 400 errors (missing fields, bad Role enum values, or invalid action)
+                ctx.status(400).result(e.getMessage() != null ? e.getMessage() : "Bad Request");
+
+            } catch (RuntimeException e) {
+                // Handles authentication failures (401)
+                ctx.status(401).result("Invalid credentials");
             }
         });
 
-        try (Scanner scanner = new Scanner(System.in)) {
-            System.out.println("Please enter your username:");
-            String username = scanner.nextLine();
-
-            System.out.println("Please enter your password:");
-            String rawPassword = scanner.nextLine();
-
-            Optional<User> existingUserOpt = Optional.ofNullable(userRepo.findByUsername(username));
-
-            if (existingUserOpt.isPresent()) {
-                User existingUser = existingUserOpt.get();
-                if (BCrypt.checkpw(rawPassword, existingUser.getPasswordHash())) {
-                    System.out.println("Login successful! Welcome back, " + existingUser.getUsername() + ".");
-                    System.out.println("Your role is: " + existingUser.getRole());
-                    if (existingUser.getDepartment() != null) {
-                        System.out.println("Department: " + existingUser.getDepartment());
-                    }
-                } else {
-                    System.out.println("Invalid credentials. Password does not match.");
-                }
-            } else {
-                System.out.println("No account found. Registering new user...");
-                Role role = Role.EMPLOYEE;
-                System.out.println("Your default role is Employee. Press 'M' to change to Manager, or press Enter to continue.");
-                if (scanner.nextLine().equalsIgnoreCase("M")) {
-                    role = Role.MANAGER;
-                    System.out.println("You are assigned as a Manager.");
-                } else {
-                    System.out.println("You are assigned as an Employee.");
-                }
-
-                User user = new User();
-                user.setUsername(username);
-                user.setPasswordHash(BCrypt.hashpw(rawPassword, BCrypt.gensalt()));
-                user.setRole(role);
-
-                System.out.println("Please enter your department:");
-                user.setDepartment(scanner.nextLine());
-                userRepo.createUser(user);
-
-                System.out.println("User registered and saved successfully with role: "
-                        + user.getRole() + " and department: " + user.getDepartment());
-            }
-        } catch (Exception e) {
-            System.err.println("An unexpected error occurred: " + e.getMessage());
-            e.printStackTrace();
-        }
+        app.start(8080);
     }
 }
