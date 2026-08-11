@@ -1,5 +1,6 @@
 package com.aishwarya.ers.controller;
 
+import com.aishwarya.ers.model.Role;
 import com.aishwarya.ers.model.User;
 import com.aishwarya.ers.dto.UserResponseDTO;
 import com.aishwarya.ers.service.UserService;
@@ -21,6 +22,7 @@ public class UserController {
         User user = new User();
         user.setUsername(req.username);
         user.setDepartment(req.department);
+        user.setRole(req.role);
 
         UserResponseDTO created = service.register(user, req.password);
         ctx.status(201);
@@ -61,6 +63,7 @@ public class UserController {
         public String username;
         public String password;
         public String department;
+        public Role role;
     }
 
     public static class UpdateRequest {

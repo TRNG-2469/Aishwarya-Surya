@@ -21,11 +21,13 @@ public class UserService {
     public UserResponseDTO register(User user, String plainPassword) {
         if (repo.findByUsername(user.getUsername()) != null)
             throw new RuntimeException("Username already taken: " + user.getUsername());
-
         user.setPasswordHash(BCrypt.hashpw(plainPassword, BCrypt.gensalt()));
-        user.setRole(Role.EMPLOYEE);
-
-        if (!repo.createUser(user))
+        if (user.getRole() == Role.MANAGER) {
+            user.setRole(Role.MANAGER);
+        } else {
+            user.setRole(Role.EMPLOYEE);
+        }
+        if(!repo.createUser(user))
             throw new RuntimeException("Failed to create user: " + user.getUsername());
 
         return UserResponseDTO.fromUser(user);
