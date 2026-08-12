@@ -5,7 +5,6 @@ import com.aishwarya.ers.dto.UserResponseDTO;
 import com.aishwarya.ers.model.Role;
 import com.aishwarya.ers.model.User;
 import com.aishwarya.ers.repository.UserRepository;
-import com.aishwarya.ers.service.ReimbursementService;
 import com.aishwarya.ers.service.UserService;
 import io.javalin.Javalin;
 import io.javalin.http.staticfiles.Location;
@@ -24,43 +23,65 @@ public class Main {
         app.post("/", ctx -> {
             JsonNode body = ctx.bodyAsClass(JsonNode.class);
 
-            try {
-                String action = body.has("action") ? body.get("action").asText() : "";
+            if (body == null || !body.has("action")) {
+                ctx.status(400).result("Bad Request: Missing action");
+                return;
+            }
 
-                if ("login".equalsIgnoreCase(action)) {
+            String action = body.get("action").asText();
+
+            if ("login".equalsIgnoreCase(action)) {
+                if (!body.has("username") || !body.has("password")) {
+                    ctx.status(400).result("Bad Request: Username and password are required");
+                    return;
+                }
+
+                try {
                     String username = body.get("username").asText();
                     String password = body.get("password").asText();
 
                     UserResponseDTO user = userService.login(username, password);
+
+                    ctx.sessionAttribute("currentUser", user);
                     ctx.status(200).json(user);
 
-                } else if ("register".equalsIgnoreCase(action)) {
+                } catch (IllegalArgumentException e) {
+                    // Bad credentials -> 401 Unauthorized
+                    ctx.status(401).result("Invalid credentials");
+                } catch (Exception e) {
+                    ctx.status(500).result("Internal server error");
+                }
+
+            } else if ("register".equalsIgnoreCase(action)) {
+                if (!body.has("username") || !body.has("password")) {
+                    ctx.status(400).result("Bad Request: Username and password are required");
+                    return;
+                }
+
+                try {
                     User newUser = new User();
                     newUser.setUsername(body.get("username").asText());
                     if (body.has("department")) newUser.setDepartment(body.get("department").asText());
-                    if (body.has("role")) newUser.setRole(Role.valueOf(body.get("role").asText()));
+                    if (body.has("role")) newUser.setRole(Role.valueOf(body.get("role").asText().toUpperCase()));
 
                     String plainPassword = body.get("password").asText();
 
                     UserResponseDTO createdUser = userService.register(newUser, plainPassword);
-                    ctx.sessionAttribute("currentUser", createdUser);
-                    ctx.status(200).json(createdUser);
 
-                } else {
-                    throw new IllegalArgumentException("Bad Request: Missing or invalid action");
+                    ctx.status(201).json(createdUser);
+
+                } catch (IllegalArgumentException e) {
+                    ctx.status(400).result(e.getMessage());
                 }
 
-            } catch (IllegalArgumentException | NullPointerException e) {
-                ctx.status(400).result(e.getMessage() != null ? e.getMessage() : "Bad Request");
-
-            } catch (RuntimeException e) {
-                ctx.status(401).result("Invalid credentials");
+            } else {
+                ctx.status(400).result("Bad Request: Invalid action");
             }
         });
 
         app.get("/api/reimbursements/{id}", ReimbursementController::getById);
         app.get("/api/reimbursements", ReimbursementController::getAll);
-        app.get("/api/users/{userId}/reimbursements", ReimbursementController::getByUserId);
+
         app.start(8080);
     }
 }

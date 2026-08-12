@@ -12,14 +12,14 @@ public class Reimbursement {
     private ReimbursementType type;
     private ReimbursementStatus status;
     private Integer resolverId;
-    private LocalDateTime createdAt;
+    private String createdAt;
 
     public Reimbursement() {
     }
 
     public Reimbursement(int id, int userId, BigDecimal amount, String description,
                          ReimbursementType type, ReimbursementStatus status,
-                         Integer resolverId, LocalDateTime createdAt) {
+                         Integer resolverId, String createdAt) {
         this.id = id;
         this.userId = userId;
         this.amount = amount;
@@ -86,11 +86,11 @@ public class Reimbursement {
         this.resolverId = resolverId;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public String getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
     }
 

@@ -105,7 +105,7 @@ public class ReimbursementController {
     }
 
     public static void getAll(Context ctx) {
-        User loggedInUser = ctx.sessionAttribute("currentUser");
+        UserResponseDTO loggedInUser = ctx.sessionAttribute("currentUser");
         if (loggedInUser == null) {
             ctx.status(401).result("Not logged in");
             return;

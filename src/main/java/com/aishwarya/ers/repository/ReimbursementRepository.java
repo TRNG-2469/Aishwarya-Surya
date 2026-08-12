@@ -249,7 +249,7 @@ public class ReimbursementRepository {
         Timestamp createdAt = resultSet.getTimestamp("created_at");
 
         if (createdAt != null) {
-            reimbursement.setCreatedAt(createdAt.toLocalDateTime());
+            reimbursement.setCreatedAt(createdAt.toString());
         }
 
         return reimbursement;

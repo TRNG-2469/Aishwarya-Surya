@@ -66,7 +66,7 @@ public class ReimbursementServiceTest {
             System.out.println("Confirmed non-managers can't approve: " + e.getMessage());
         }
 
-        List<Reimbursement> userReimbursements = reimbursementService.getByUserId(user.getId(), user.getId());
+        List<Reimbursement> userReimbursements = reimbursementService.getAllReimbursements(user.getId());
         System.out.println("Total reimbursements for user: " + userReimbursements.size());
     }
 }
