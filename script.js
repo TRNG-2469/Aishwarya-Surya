@@ -33,38 +33,31 @@ document.getElementById("authForm").addEventListener("submit", async function (e
 
     if (isRegisterMode) {
         const department = document.getElementById("department").value;
-        const role = document.getElementById("role").value;
 
         try {
             const response = await fetch("/", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                credentials: "include", // Ensures session cookie is tracked
+                credentials: "include",
                 body: JSON.stringify({
                     action: "register",
                     username: username,
                     password: password,
-                    department: department,
-                    role: role
+                    department: department
                 })
             });
 
             if (response.ok) {
                 const newUser = await response.json();
-                msg.style.color = "green";
                 msg.textContent = "Account created successfully for " + newUser.username + "! You can now log in.";
                 localStorage.setItem("currentUser", JSON.stringify(newUser));
 
-                // Automatically switch back to login mode
                 document.getElementById("toggleRegister").click();
             } else {
-                const errorText = await response.text();
-                msg.style.color = "red";
-                msg.textContent = errorText || "Registration failed. Username may already be taken.";
+                msg.textContent = "User already has an account.";
             }
         } catch (err) {
             console.error("Registration network error:", err);
-            msg.style.color = "red";
             msg.textContent = "Unable to connect to the server.";
         }
 
@@ -73,7 +66,7 @@ document.getElementById("authForm").addEventListener("submit", async function (e
             const response = await fetch("/", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                credentials: "include", // Required for Javalin session state
+                credentials: "include",
                 body: JSON.stringify({
                     action: "login",
                     username: username,
@@ -83,26 +76,21 @@ document.getElementById("authForm").addEventListener("submit", async function (e
 
             if (response.ok) {
                 const user = await response.json();
-                msg.style.color = "green";
                 msg.textContent = "Welcome back, " + user.username + "! Redirecting...";
                 localStorage.setItem("currentUser", JSON.stringify(user));
 
-                // Frontend redirect to the user's reimbursements endpoint
                 setTimeout(() => {
                     window.location.href = `/api/reimbursements/${user.id}`;
                 }, 1000);
 
             } else if (response.status === 401) {
-                msg.style.color = "red";
                 msg.textContent = "Incorrect username or password.";
             } else {
                 const errorText = await response.text();
-                msg.style.color = "red";
                 msg.textContent = errorText || ("Server error during login (" + response.status + ").");
             }
         } catch (err) {
             console.error("Login network error:", err);
-            msg.style.color = "red";
             msg.textContent = "Unable to connect to the server.";
         }
     }
@@ -112,7 +100,7 @@ async function fetchUserReimbursements(userId) {
     try {
         const response = await fetch(`/api/reimbursements/${userId}`, {
             method: "GET",
-            credentials: "include" // Passes the logged-in session cookie to backend
+            credentials: "include"
         });
 
         if (response.status === 403) {
