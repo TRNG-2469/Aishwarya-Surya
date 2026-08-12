@@ -8,7 +8,6 @@ public class User {
     private Role role;
     private String department;
 
-    // Constructors
 
     public User() {
     }

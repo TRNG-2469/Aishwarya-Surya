@@ -16,7 +16,6 @@ public class Main {
         UserService userService = new UserService(repo);
 
         Javalin app = Javalin.create(config -> {
-            // "." points to your project root folder on the file system
             config.staticFiles.add(".", Location.EXTERNAL);
         });
 
@@ -45,16 +44,13 @@ public class Main {
                     ctx.status(201).json(createdUser);
 
                 } else {
-                    // Triggers the 400 catch block below for invalid actions
                     throw new IllegalArgumentException("Bad Request: Missing or invalid action");
                 }
 
             } catch (IllegalArgumentException | NullPointerException e) {
-                // Single place for all 400 errors (missing fields, bad Role enum values, or invalid action)
                 ctx.status(400).result(e.getMessage() != null ? e.getMessage() : "Bad Request");
 
             } catch (RuntimeException e) {
-                // Handles authentication failures (401)
                 ctx.status(401).result("Invalid credentials");
             }
         });

@@ -1,6 +1,5 @@
 let isRegisterMode = false;
 
-// Toggle between Login and Register modes
 document.getElementById("toggleRegister").addEventListener("click", function (e) {
     e.preventDefault();
 
@@ -23,7 +22,6 @@ document.getElementById("toggleRegister").addEventListener("click", function (e)
     }
 });
 
-// Form Submission Handler
 document.getElementById("authForm").addEventListener("submit", async function (e) {
     e.preventDefault();
 
@@ -34,52 +32,100 @@ document.getElementById("authForm").addEventListener("submit", async function (e
     msg.textContent = "";
 
     if (isRegisterMode) {
-        // --- REGISTER ---
         const department = document.getElementById("department").value;
         const role = document.getElementById("role").value;
 
-        // POST request sent directly to root URL "/"
-        const response = await fetch("/", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                action: "register", // Helps Java differentiate if needed
-                username: username,
-                password: password,
-                department: department,
-                role: role
-            })
-        });
+        try {
+            const response = await fetch("/", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include", // Ensures session cookie is tracked
+                body: JSON.stringify({
+                    action: "register",
+                    username: username,
+                    password: password,
+                    department: department,
+                    role: role
+                })
+            });
 
-        if (response.ok) {
-            const newUser = await response.json();
-            msg.textContent = "Account created successfully for " + newUser.username + "!";
-            localStorage.setItem("currentUser", JSON.stringify(newUser));
-        } else {
-            msg.textContent = "Registration failed. Username may already be taken.";
+            if (response.ok) {
+                const newUser = await response.json();
+                msg.style.color = "green";
+                msg.textContent = "Account created successfully for " + newUser.username + "! You can now log in.";
+                localStorage.setItem("currentUser", JSON.stringify(newUser));
+
+                // Automatically switch back to login mode
+                document.getElementById("toggleRegister").click();
+            } else {
+                const errorText = await response.text();
+                msg.style.color = "red";
+                msg.textContent = errorText || "Registration failed. Username may already be taken.";
+            }
+        } catch (err) {
+            console.error("Registration network error:", err);
+            msg.style.color = "red";
+            msg.textContent = "Unable to connect to the server.";
         }
 
     } else {
-        // --- LOGIN ---
-        // POST request sent directly to root URL "/"
-        const response = await fetch("/", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                action: "login", // Helps Java differentiate if needed
-                username: username,
-                password: password
-            })
-        });
+        try {
+            const response = await fetch("/", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include", // Required for Javalin session state
+                body: JSON.stringify({
+                    action: "login",
+                    username: username,
+                    password: password
+                })
+            });
 
-        if (response.ok) {
-            const user = await response.json();
-            msg.textContent = "Welcome back, " + user.username + "!";
-            localStorage.setItem("currentUser", JSON.stringify(user));
-        } else if (response.status === 401) {
-            msg.textContent = "Incorrect username or password.";
-        } else {
-            msg.textContent = "Server error during login (" + response.status + ").";
+            if (response.ok) {
+                const user = await response.json();
+                msg.style.color = "green";
+                msg.textContent = "Welcome back, " + user.username + "! Redirecting...";
+                localStorage.setItem("currentUser", JSON.stringify(user));
+
+                // Frontend redirect to the user's reimbursements endpoint
+                setTimeout(() => {
+                    window.location.href = `/api/reimbursements/${user.id}`;
+                }, 1000);
+
+            } else if (response.status === 401) {
+                msg.style.color = "red";
+                msg.textContent = "Incorrect username or password.";
+            } else {
+                const errorText = await response.text();
+                msg.style.color = "red";
+                msg.textContent = errorText || ("Server error during login (" + response.status + ").");
+            }
+        } catch (err) {
+            console.error("Login network error:", err);
+            msg.style.color = "red";
+            msg.textContent = "Unable to connect to the server.";
         }
     }
 });
+
+async function fetchUserReimbursements(userId) {
+    try {
+        const response = await fetch(`/api/reimbursements/${userId}`, {
+            method: "GET",
+            credentials: "include" // Passes the logged-in session cookie to backend
+        });
+
+        if (response.status === 403) {
+            alert("Access Denied: You are not authorized to view these reimbursements.");
+            return null;
+        }
+
+        if (!response.ok) {
+            throw new Error(`Failed to fetch reimbursements: ${response.status}`);
+        }
+
+        return await response.json();
+    } catch (err) {
+        console.error("Error loading reimbursements:", err);
+    }
+}

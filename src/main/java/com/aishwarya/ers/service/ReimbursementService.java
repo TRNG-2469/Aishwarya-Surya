@@ -3,12 +3,10 @@ package com.aishwarya.ers.service;
 import com.aishwarya.ers.exception.ForbiddenException;
 import com.aishwarya.ers.model.Reimbursement;
 import com.aishwarya.ers.model.ReimbursementStatus;
-import com.aishwarya.ers.repository.ReimbursementRepository;
-
 import com.aishwarya.ers.model.Role;
 import com.aishwarya.ers.model.User;
+import com.aishwarya.ers.repository.ReimbursementRepository;
 import com.aishwarya.ers.repository.UserRepository;
-import io.javalin.http.Context;
 
 import java.util.List;
 
@@ -34,8 +32,16 @@ public class ReimbursementService {
         return r;
     }
 
-    public List<Reimbursement> getByUserId(int userId) {
-        return repo.findByUserId(userId);
+    public List<Reimbursement> getByUserId(int targetUserId, User loggedInUser) {
+        if (loggedInUser == null) {
+            throw new IllegalArgumentException("User context missing.");
+        }
+
+        if (loggedInUser.getRole() == Role.MANAGER || loggedInUser.getId() == targetUserId) {
+            return repo.findByUserId(targetUserId);
+        }
+
+        throw new ForbiddenException("Access Denied: You are not authorized to view reimbursements for user " + targetUserId);
     }
 
     public List<Reimbursement> getAll() {
@@ -66,7 +72,6 @@ public class ReimbursementService {
     }
 
     private void resolve(int id, ReimbursementStatus status, int resolverId, String action) {
-
         User resolver = userRepo.findById(resolverId);
 
         if (resolver == null) {
@@ -93,6 +98,6 @@ public class ReimbursementService {
             throw new ForbiddenException("Access Denied: Only Managers can view all reimbursements.");
         }
 
-        return ReimbursementRepository.findAll();
+        return repo.findAll();
     }
 }

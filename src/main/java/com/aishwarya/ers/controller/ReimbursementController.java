@@ -2,6 +2,7 @@ package com.aishwarya.ers.controller;
 
 import com.aishwarya.ers.model.Reimbursement;
 import com.aishwarya.ers.model.ReimbursementStatus;
+import com.aishwarya.ers.model.User;
 import com.aishwarya.ers.service.ReimbursementService;
 import io.javalin.http.Context;
 
@@ -41,8 +42,10 @@ public class ReimbursementController {
     }
 
     public void getByUserId(Context ctx) {
-        int userId = Integer.parseInt(ctx.pathParam("userId"));
-        List<Reimbursement> reimbursements = service.getByUserId(userId);
+        String idParam = ctx.pathParamMap().containsKey("id") ? ctx.pathParam("id") : ctx.pathParam("userId");
+        int targetUserId = Integer.parseInt(idParam);
+        User loggedInUser = ctx.sessionAttribute("currentUser");
+        List<Reimbursement> reimbursements = service.getByUserId(targetUserId, loggedInUser);
         ctx.json(reimbursements);
     }
 
