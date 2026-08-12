@@ -22,6 +22,39 @@
     <button type="submit" id="submitBtn">Login</button>
 </form>
     <button id="logoutBtn" style="display: none;">Logout</button>
+<div id="reimbursementSection" style="display: none;">
+    <h2>Submit Reimbursement</h2>
+
+    <form id="reimbursementForm">
+        <input
+                type="number"
+                id="amount"
+                placeholder="Amount"
+                step="0.01"
+                min="0.01"
+                required
+        >
+
+        <input
+                type="text"
+                id="description"
+                placeholder="Description"
+                required
+        >
+
+        <select id="type" required>
+            <option value="">Select reimbursement type</option>
+            <option value="TRAVEL">Travel</option>
+            <option value="FOOD">Food</option>
+            <option value="LODGING">Lodging</option>
+            <option value="OTHER">Other</option>
+        </select>
+
+        <button type="submit">Submit Reimbursement</button>
+    </form>
+
+    <p id="reimbursementMsg"></p>
+</div>
 
 <p>
     <a href="#" id="toggleRegister">Don't have an account? Register here</a>

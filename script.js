@@ -136,6 +136,7 @@ document.getElementById("authForm").addEventListener("submit", async function (e
                 document.getElementById("toggleRegister").style.display = "block";
                 document.getElementById("formTitle").textContent = "Login";
                 document.getElementById("logoutBtn").style.display = "none";
+                document.getElementById("reimbursementSection").style.display = "block";
 
                 document.getElementById("username").value = "";
                 document.getElementById("password").value = "";

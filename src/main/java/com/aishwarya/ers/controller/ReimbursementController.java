@@ -4,7 +4,6 @@ import com.aishwarya.ers.dto.UserResponseDTO;
 import com.aishwarya.ers.model.Reimbursement;
 import com.aishwarya.ers.model.ReimbursementStatus;
 import com.aishwarya.ers.model.Role;
-import com.aishwarya.ers.model.User;
 import com.aishwarya.ers.repository.ReimbursementRepository;
 import com.aishwarya.ers.repository.UserRepository;
 import com.aishwarya.ers.service.ReimbursementService;
