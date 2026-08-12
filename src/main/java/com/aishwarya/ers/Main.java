@@ -62,7 +62,6 @@ public class Main {
                     User newUser = new User();
                     newUser.setUsername(body.get("username").asText());
                     if (body.has("department")) newUser.setDepartment(body.get("department").asText());
-                    if (body.has("role")) newUser.setRole(Role.valueOf(body.get("role").asText().toUpperCase()));
 
                     String plainPassword = body.get("password").asText();
 

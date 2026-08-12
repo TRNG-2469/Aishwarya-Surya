@@ -31,11 +31,7 @@ public class UserService {
         if (repo.findByUsername(user.getUsername()) != null)
             throw new RuntimeException("Username already taken: " + user.getUsername());
         user.setPasswordHash(BCrypt.hashpw(plainPassword, BCrypt.gensalt()));
-        if (user.getRole() == Role.MANAGER) {
-            user.setRole(Role.MANAGER);
-        } else {
-            user.setRole(Role.EMPLOYEE);
-        }
+        user.setRole(Role.EMPLOYEE);
         if(!repo.createUser(user))
             throw new RuntimeException("Failed to create user: " + user.getUsername());
 
