@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Reimbursements</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="reimbursements.js" defer></script>
+</head>
+<body>
+
+<h1>Reimbursements</h1>
+
+<p id="welcomeMsg"></p>
+
+<h2>Submit Reimbursement</h2>
+
+<form id="reimbursementForm">
+    <input
+            type="number"
+            id="amount"
+            placeholder="Amount"
+            step="0.01"
+            min="0.01"
+            required
+    >
+
+    <input
+            type="text"
+            id="description"
+            placeholder="Description"
+            required
+    >
+
+    <select id="type" required>
+        <option value="">Select reimbursement type</option>
+        <option value="TRAVEL">Travel</option>
+        <option value="FOOD">Food</option>
+        <option value="LODGING">Lodging</option>
+        <option value="OTHER">Other</option>
+    </select>
+
+    <button type="submit">Submit Reimbursement</button>
+</form>
+
+<p id="reimbursementMsg"></p>
+
+<h2>My Reimbursements</h2>
+
+<div id="reimbursementList"></div>
+
+<button id="logoutBtn">Logout</button>
+
+</body>
+</html>
