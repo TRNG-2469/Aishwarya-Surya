@@ -4,6 +4,8 @@ import com.aishwarya.ers.exception.ForbiddenException;
 import com.aishwarya.ers.model.Reimbursement;
 import com.aishwarya.ers.model.ReimbursementStatus;
 import com.aishwarya.ers.repository.ReimbursementRepository;
+import com.aishwarya.ers.exception.UserNotFoundException;
+import com.aishwarya.ers.exception.ForbiddenException;
 
 import com.aishwarya.ers.model.Role;
 import com.aishwarya.ers.model.User;
@@ -46,7 +48,17 @@ public class ReimbursementService {
         return repo.findByStatus(status);
     }
 
-    public List<Reimbursement> getByFilters(ReimbursementStatus status, String department) {
+    public List<Reimbursement> getByFilters(int callerId, ReimbursementStatus status, String department) {
+        User caller = userRepo.findById(callerId);
+
+        if (caller == null) {
+            throw new UserNotFoundException(callerId);
+        }
+
+        if (caller.getRole() != Role.MANAGER) {
+            throw new ForbiddenException("Only managers can view all reimbursements");
+        }
+
         return repo.findByFilters(status, department);
     }
 

@@ -23,6 +23,7 @@ public class ReimbursementController {
     }
 
     public void getFiltered(Context ctx) {
+        int callerId = Integer.parseInt(ctx.queryParam("callerId"));
         String statusParam = ctx.queryParam("status");
         String department = ctx.queryParam("department");
 
@@ -30,7 +31,7 @@ public class ReimbursementController {
                 ? ReimbursementStatus.valueOf(statusParam.toUpperCase())
                 : null;
 
-        List<Reimbursement> reimbursements = service.getByFilters(status, department);
+        List<Reimbursement> reimbursements = service.getByFilters(callerId, status, department);
         ctx.json(reimbursements);
     }
 
