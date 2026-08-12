@@ -87,4 +87,21 @@ public class UserService {
         }
     }
 
+
+    public UserResponseDTO login(String username, String plainPassword) {
+
+        User user = repo.findByUsername(username);
+
+        if (user == null) {
+            throw new RuntimeException("Invalid username or password");
+        }
+
+        boolean matches = BCrypt.checkpw(plainPassword, user.getPasswordHash());
+
+        if (!matches) {
+            throw new RuntimeException("Invalid username or password");
+        }
+
+        return UserResponseDTO.fromUser(user);
+    }
 }
