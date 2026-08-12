@@ -20,11 +20,29 @@ public class ReimbursementController {
         this.service = service;
     }
 
-    public void submit(Context ctx) {
-        Reimbursement payload = ctx.bodyAsClass(Reimbursement.class);
-        Reimbursement created = service.submit(payload);
-        ctx.status(201);
-        ctx.json(created);
+    public static void submit(Context ctx) {
+        UserResponseDTO loggedInUser = ctx.sessionAttribute("currentUser");
+
+        if (loggedInUser == null) {
+            ctx.status(401).result("Not logged in");
+            return;
+        }
+
+        try {
+            Reimbursement payload = ctx.bodyAsClass(Reimbursement.class);
+
+            // Always use the logged-in user's ID
+            payload.setUserId(loggedInUser.getId());
+
+            Reimbursement created = service.submit(payload);
+
+            ctx.status(201).json(created);
+
+        } catch (IllegalArgumentException e) {
+            ctx.status(400).result(e.getMessage());
+        } catch (RuntimeException e) {
+            ctx.status(400).result(e.getMessage());
+        }
     }
 
     public void getFiltered(Context ctx) {

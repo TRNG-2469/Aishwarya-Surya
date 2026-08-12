@@ -23,8 +23,25 @@ public class ReimbursementService {
     }
 
     public Reimbursement submit(Reimbursement r) {
+
+        if (r.getAmount() == null || r.getAmount().signum() <= 0) {
+            throw new IllegalArgumentException("Amount must be greater than 0");
+        }
+
+        if (r.getDescription() == null || r.getDescription().isBlank()) {
+            throw new IllegalArgumentException("Description is required");
+        }
+
+        if (r.getType() == null) {
+            throw new IllegalArgumentException("Reimbursement type is required");
+        }
+
         r.setStatus(ReimbursementStatus.PENDING);
-        if (!repo.create(r)) throw new RuntimeException("Failed to create reimbursement request");
+
+        if (!repo.create(r)) {
+            throw new RuntimeException("Failed to create reimbursement request");
+        }
+
         return r;
     }
 

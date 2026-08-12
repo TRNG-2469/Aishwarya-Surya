@@ -76,6 +76,7 @@ public class Main {
 
         app.get("/api/reimbursements/{id}", ReimbursementController::getById);
         app.get("/api/reimbursements", ReimbursementController::getAll);
+        app.post("/api/reimbursements", ReimbursementController::submit);
 
         app.post("/logout", ctx -> {
             ctx.req().getSession().invalidate();
