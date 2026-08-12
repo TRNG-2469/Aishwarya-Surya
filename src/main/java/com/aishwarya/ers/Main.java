@@ -1,9 +1,11 @@
 package com.aishwarya.ers;
 
+import com.aishwarya.ers.controller.ReimbursementController;
 import com.aishwarya.ers.dto.UserResponseDTO;
 import com.aishwarya.ers.model.Role;
 import com.aishwarya.ers.model.User;
 import com.aishwarya.ers.repository.UserRepository;
+import com.aishwarya.ers.service.ReimbursementService;
 import com.aishwarya.ers.service.UserService;
 import io.javalin.Javalin;
 import io.javalin.http.staticfiles.Location;
@@ -41,7 +43,8 @@ public class Main {
                     String plainPassword = body.get("password").asText();
 
                     UserResponseDTO createdUser = userService.register(newUser, plainPassword);
-                    ctx.status(201).json(createdUser);
+                    ctx.sessionAttribute("currentUser", createdUser);
+                    ctx.status(200).json(createdUser);
 
                 } else {
                     throw new IllegalArgumentException("Bad Request: Missing or invalid action");
@@ -55,6 +58,9 @@ public class Main {
             }
         });
 
+        app.get("/api/reimbursements/{id}", ReimbursementController::getById);
+        app.get("/api/reimbursements", ReimbursementController::getAll);
+        app.get("/api/users/{userId}/reimbursements", ReimbursementController::getByUserId);
         app.start(8080);
     }
 }

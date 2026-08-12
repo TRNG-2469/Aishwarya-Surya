@@ -1,6 +1,7 @@
 package com.aishwarya.ers.service;
 
 import com.aishwarya.ers.exception.ForbiddenException;
+import com.aishwarya.ers.exception.ReimbursementNotFoundException;
 import com.aishwarya.ers.exception.UserNotFoundException;
 import com.aishwarya.ers.model.Reimbursement;
 import com.aishwarya.ers.model.ReimbursementStatus;
@@ -29,7 +30,7 @@ public class ReimbursementService {
 
     public Reimbursement getById(int id) {
         Reimbursement r = repo.findById(id);
-        if (r == null) throw new RuntimeException("No reimbursement with id " + id);
+        if (r == null) throw new ReimbursementNotFoundException("No reimbursement with id " + id);
         return r;
     }
 

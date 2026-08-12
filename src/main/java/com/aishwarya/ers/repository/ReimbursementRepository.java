@@ -54,7 +54,7 @@ public class ReimbursementRepository {
 
         String sql = """
                 SELECT id, user_id, amount, description, type, status,
-                       resolver_id, created_at, resolved_at
+                       resolver_id, created_at
                 FROM reimbursements
                 WHERE id = ?
                 """;
@@ -81,7 +81,7 @@ public class ReimbursementRepository {
 
         String sql = """
                 SELECT id, user_id, amount, description, type, status,
-                       resolver_id, created_at, resolved_at
+                       resolver_id, created_at
                 FROM reimbursements
                 WHERE user_id = ?
                 ORDER BY created_at DESC
@@ -111,7 +111,7 @@ public class ReimbursementRepository {
 
         String sql = """
                 SELECT id, user_id, amount, description, type, status,
-                       resolver_id, created_at, resolved_at
+                       resolver_id, created_at
                 FROM reimbursements
                 ORDER BY created_at DESC
                 """;
@@ -137,7 +137,7 @@ public class ReimbursementRepository {
 
         String sql = """
                 SELECT id, user_id, amount, description, type, status,
-                       resolver_id, created_at, resolved_at
+                       resolver_id, created_at
                 FROM reimbursements
                 WHERE status = ?
                 ORDER BY created_at DESC
@@ -202,8 +202,7 @@ public class ReimbursementRepository {
         String sql = """
                 UPDATE reimbursements
                 SET status = ?,
-                    resolver_id = ?,
-                    resolved_at = CURRENT_TIMESTAMP
+                    resolver_id = ?
                 WHERE id = ?
                   AND status = 'PENDING'
                 """;
@@ -260,7 +259,7 @@ public class ReimbursementRepository {
 
         StringBuilder sql = new StringBuilder("""
             SELECT r.id, r.user_id, r.amount, r.description, r.type, r.status,
-                   r.resolver_id, r.created_at, r.resolved_at
+                   r.resolver_id, r.created_at
             FROM reimbursements r
             JOIN users u ON r.user_id = u.id
             WHERE 1=1
