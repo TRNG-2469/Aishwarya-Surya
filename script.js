@@ -50,7 +50,6 @@ document.getElementById("authForm").addEventListener("submit", async function (e
             if (response.ok) {
                 const newUser = await response.json();
                 msg.textContent = "Account created successfully for " + newUser.username + "! You can now log in.";
-                localStorage.setItem("currentUser", JSON.stringify(newUser));
 
                 document.getElementById("toggleRegister").click();
             } else {
@@ -76,12 +75,14 @@ document.getElementById("authForm").addEventListener("submit", async function (e
 
             if (response.ok) {
                 const user = await response.json();
-                msg.textContent = "Welcome back, " + user.username + "! Redirecting...";
                 localStorage.setItem("currentUser", JSON.stringify(user));
 
-                setTimeout(() => {
-                    window.location.href = `/api/reimbursements/${user.id}`;
-                }, 1000);
+                document.getElementById("authForm").style.display = "none";
+                document.getElementById("toggleRegister").style.display = "none";
+                document.getElementById("formTitle").textContent = "Logged In";
+                document.getElementById("logoutBtn").style.display = "inline-block";
+
+                msg.textContent = "Welcome back, " + user.username + "!";
 
             } else if (response.status === 401) {
                 msg.textContent = "Incorrect username or password.";
@@ -96,24 +97,55 @@ document.getElementById("authForm").addEventListener("submit", async function (e
     }
 });
 
-async function fetchUserReimbursements(userId) {
-    try {
-        const response = await fetch(`/api/reimbursements/${userId}`, {
-            method: "GET",
-            credentials: "include"
-        });
+    async function fetchUserReimbursements(userId) {
+        try {
+            const response = await fetch(`/api/reimbursements/${userId}`, {
+                method: "GET",
+                credentials: "include"
+            });
 
-        if (response.status === 403) {
-            alert("Access Denied: You are not authorized to view these reimbursements.");
-            return null;
+            if (response.status === 403) {
+                alert("Access Denied: You are not authorized to view these reimbursements.");
+                return null;
+            }
+
+            if (!response.ok) {
+                throw new Error(`Failed to fetch reimbursements: ${response.status}`);
+            }
+
+            return await response.json();
+
+        } catch (err) {
+            console.error("Error loading reimbursements:", err);
         }
-
-        if (!response.ok) {
-            throw new Error(`Failed to fetch reimbursements: ${response.status}`);
-        }
-
-        return await response.json();
-    } catch (err) {
-        console.error("Error loading reimbursements:", err);
     }
-}
+
+    document.getElementById("logoutBtn").addEventListener("click", async function () {
+        const msg = document.getElementById("msg");
+
+        try {
+            const response = await fetch("/logout", {
+                method: "POST",
+                credentials: "include"
+            });
+
+            if (response.ok) {
+                localStorage.removeItem("currentUser");
+
+                document.getElementById("authForm").style.display = "block";
+                document.getElementById("toggleRegister").style.display = "block";
+                document.getElementById("formTitle").textContent = "Login";
+                document.getElementById("logoutBtn").style.display = "none";
+
+                document.getElementById("username").value = "";
+                document.getElementById("password").value = "";
+
+                msg.textContent = "Logged out successfully.";
+            } else {
+                msg.textContent = "Logout failed.";
+            }
+        } catch (err) {
+            console.error("Logout network error:", err);
+            msg.textContent = "Unable to connect to the server.";
+        }
+    });
