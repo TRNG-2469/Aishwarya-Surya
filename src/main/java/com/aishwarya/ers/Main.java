@@ -2,7 +2,6 @@ package com.aishwarya.ers;
 
 import com.aishwarya.ers.controller.ReimbursementController;
 import com.aishwarya.ers.dto.UserResponseDTO;
-import com.aishwarya.ers.model.Role;
 import com.aishwarya.ers.model.User;
 import com.aishwarya.ers.repository.UserRepository;
 import com.aishwarya.ers.service.UserService;
@@ -45,11 +44,8 @@ public class Main {
                     ctx.sessionAttribute("currentUser", user);
                     ctx.status(200).json(user);
 
-                } catch (IllegalArgumentException e) {
-                    // Bad credentials -> 401 Unauthorized
+                } catch (RuntimeException e) {
                     ctx.status(401).result("Invalid credentials");
-                } catch (Exception e) {
-                    ctx.status(500).result("Internal server error");
                 }
 
             } else if ("register".equalsIgnoreCase(action)) {
@@ -80,6 +76,11 @@ public class Main {
 
         app.get("/api/reimbursements/{id}", ReimbursementController::getById);
         app.get("/api/reimbursements", ReimbursementController::getAll);
+
+        app.post("/logout", ctx -> {
+            ctx.req().getSession().invalidate();
+            ctx.status(200).result("Logged out successfully");
+        });
 
         app.start(8080);
     }
