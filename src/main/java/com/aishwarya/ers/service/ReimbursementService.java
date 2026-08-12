@@ -33,16 +33,18 @@ public class ReimbursementService {
         return r;
     }
 
-    public List<Reimbursement> getByUserId(int targetUserId, User loggedInUser) {
-        if (loggedInUser == null) {
-            throw new IllegalArgumentException("User context missing.");
+    public List<Reimbursement> getByUserId(int targetUserId, int requesterId) {
+        User requester = userRepo.findById(requesterId);
+        if (requester == null) {
+            throw new IllegalArgumentException("No user with id " + requesterId);
         }
-
-        if (loggedInUser.getRole() == Role.MANAGER || loggedInUser.getId() == targetUserId) {
+        if (requester.getRole() == Role.MANAGER) {
             return repo.findByUserId(targetUserId);
         }
-
-        throw new ForbiddenException("Access Denied: You are not authorized to view reimbursements for user " + targetUserId);
+        if (requester.getId() != targetUserId) {
+            throw new ForbiddenException("Access Denied: You can only view your own reimbursements.");
+        }
+        return repo.findByUserId(requester.getId());
     }
 
     public List<Reimbursement> getAll() {
@@ -100,15 +102,14 @@ public class ReimbursementService {
                     + " (it may not exist or is no longer pending)");
     }
 
-    public List<Reimbursement> getAllReimbursements(User loggedInUser) {
-        if (loggedInUser == null) {
-            throw new IllegalArgumentException("User cannot be null");
+    public List<Reimbursement> getAllReimbursements(int requesterId) {
+        User requester = userRepo.findById(requesterId);
+        if (requester == null) {
+            throw new IllegalArgumentException("No user with id " + requesterId);
         }
-
-        if (loggedInUser.getRole() != Role.MANAGER) {
-            throw new ForbiddenException("Access Denied: Only Managers can view all reimbursements.");
+        if (requester.getRole() == Role.MANAGER) {
+            return repo.findAll();
         }
-
-        return repo.findAll();
+        return repo.findByUserId(requester.getId());
     }
 }
