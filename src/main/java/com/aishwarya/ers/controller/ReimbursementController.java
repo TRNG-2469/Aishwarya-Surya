@@ -45,7 +45,12 @@ public class ReimbursementController {
         String idParam = ctx.pathParamMap().containsKey("id") ? ctx.pathParam("id") : ctx.pathParam("userId");
         int targetUserId = Integer.parseInt(idParam);
         User loggedInUser = ctx.sessionAttribute("currentUser");
-        List<Reimbursement> reimbursements = service.getByUserId(targetUserId, loggedInUser);
+        if (loggedInUser == null) {
+            ctx.status(401).result("Not logged in");
+            return;
+        }
+
+        List<Reimbursement> reimbursements = service.getByUserId(targetUserId, loggedInUser.getId());
         ctx.json(reimbursements);
     }
 
