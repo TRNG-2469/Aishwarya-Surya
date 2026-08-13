@@ -5,12 +5,42 @@
 body {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
     min-height: 100vh;
     margin: 0;
     gap: 12px;
     background-color: lightgreen;
+}
+
+/* Navbar Styles */
+.navbar {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 24px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar h1 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+/* Equal-width wrappers to keep the title perfectly centered */
+.nav-left, .nav-right {
+    flex: 1;
+    display: flex;
+}
+
+.nav-left {
+    justify-content: flex-start;
+}
+
+.nav-right {
+    justify-content: flex-end;
 }
 
 table, thead, tbody, tfoot, tr, th, td {
@@ -81,17 +111,9 @@ table td button:last-child {
     margin-right: 0;
 }
 
-#logoutBtn {
-    position: fixed;
-    top: 16px;
-    right: 16px;
-    margin: 0;
-}
-
+/* Cleaned up old absolute position styles */
+#logoutBtn,
 #managerViewBtn,
 #backBtn {
-    position: fixed;
-    top: 16px;
-    left: 16px;
     margin: 0;
 }
