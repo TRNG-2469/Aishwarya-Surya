@@ -9,6 +9,14 @@ const currentUser = JSON.parse(storedUser);
 document.getElementById("welcomeMsg").textContent =
     "Welcome, " + currentUser.username;
 
+if (currentUser.role === "MANAGER") {
+    const managerViewBtn = document.getElementById("managerViewBtn");
+    managerViewBtn.style.display = "inline-block";
+    managerViewBtn.addEventListener("click", function () {
+        window.location.href = "/all-reimbursements.html";
+    });
+}
+
 async function loadReimbursements() {
     try {
         const response = await fetch(
