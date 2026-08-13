@@ -187,10 +187,3 @@ document.getElementById("statusFilter")
 // Initial load
 loadReimbursements();
 
-//Only employees can submit a reimbursement and view their own reimbursements (since all reimbursements is on a separate page for managers)
-const employeeSection = document.getElementById("employeeOnlySection");
-
-if (employeeSection) {
-    employeeSection.style.display =
-        currentUser.role === "MANAGER" ? "none" : "block";
-}
