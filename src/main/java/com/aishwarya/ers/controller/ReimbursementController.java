@@ -111,14 +111,32 @@ public class ReimbursementController {
         ctx.json(reimbursements);
     }
 
-    public void updatePending(Context ctx) {
-        int id = Integer.parseInt(ctx.pathParam("id"));
-        Reimbursement payload = ctx.bodyAsClass(Reimbursement.class);
-        payload.setId(id);
-        Reimbursement updated = service.updatePending(payload);
-        ctx.json(updated);
-    }
+    public static void updatePending(Context ctx) {
+        UserResponseDTO loggedInUser = ctx.sessionAttribute("currentUser");
 
+        if (loggedInUser == null) {
+            ctx.status(401).result("Not logged in");
+            return;
+        }
+
+        try {
+            int id = Integer.parseInt(ctx.pathParam("id"));
+
+            Reimbursement payload = ctx.bodyAsClass(Reimbursement.class);
+
+            payload.setId(id);
+            payload.setUserId(loggedInUser.getId());
+
+            Reimbursement updated = service.updatePending(payload);
+
+            ctx.status(200).json(updated);
+
+        } catch (NumberFormatException e) {
+            ctx.status(400).result("Invalid reimbursement ID");
+        } catch (RuntimeException e) {
+            ctx.status(400).result(e.getMessage());
+        }
+    }
     public void approve(Context ctx) {
         int id = Integer.parseInt(ctx.pathParam("id"));
         int resolverId = Integer.parseInt(ctx.queryParam("resolverId"));

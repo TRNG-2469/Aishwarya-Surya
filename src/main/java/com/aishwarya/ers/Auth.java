@@ -75,6 +75,11 @@ public class Auth {
         app.get("/api/reimbursements", ReimbursementController::getAll);
         app.post("/api/reimbursements", ReimbursementController::submit);
 
+        app.put(
+                "/api/reimbursements/{id}",
+                ReimbursementController::updatePending
+        );
+
         app.get(
                 "/api/reimbursements/{id}/status/{status}",
                 ReimbursementController::getByUserIdAndStatus
