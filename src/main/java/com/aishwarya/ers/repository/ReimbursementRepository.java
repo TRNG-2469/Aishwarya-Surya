@@ -106,24 +106,32 @@ public class ReimbursementRepository {
 
         return reimbursements;
     }
-
-    public static List<Reimbursement> findAll() {
+    public List<Reimbursement> findByUserIdAndStatus(
+            int userId,
+            ReimbursementStatus status
+    ) {
 
         String sql = """
-                SELECT id, user_id, amount, description, type, status,
-                       resolver_id, created_at
-                FROM reimbursements
-                ORDER BY created_at DESC
-                """;
+            SELECT id, user_id, amount, description, type, status,
+                   resolver_id, created_at
+            FROM reimbursements
+            WHERE user_id = ?
+              AND status = ?
+            ORDER BY created_at DESC
+            """;
 
         List<Reimbursement> reimbursements = new ArrayList<>();
 
         try (Connection connection = ConnectionFactory.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql);
-             ResultSet resultSet = statement.executeQuery()) {
+             PreparedStatement statement = connection.prepareStatement(sql)) {
 
-            while (resultSet.next()) {
-                reimbursements.add(mapRow(resultSet));
+            statement.setInt(1, userId);
+            statement.setString(2, status.name());
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    reimbursements.add(mapRow(resultSet));
+                }
             }
 
         } catch (SQLException e) {

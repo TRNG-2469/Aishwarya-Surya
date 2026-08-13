@@ -130,4 +130,28 @@ public class ReimbursementService {
         }
         return repo.findByUserId(requester.getId());
     }
+
+    public List<Reimbursement> getByUserIdAndStatus(
+            int targetUserId,
+            int requesterId,
+            ReimbursementStatus status
+    ) {
+        User requester = userRepo.findById(requesterId);
+
+        if (requester == null) {
+            throw new IllegalArgumentException("No user with id " + requesterId);
+        }
+
+        if (requester.getRole() == Role.MANAGER) {
+            return repo.findByUserIdAndStatus(targetUserId, status);
+        }
+
+        if (requester.getId() != targetUserId) {
+            throw new ForbiddenException(
+                    "Access Denied: You can only view your own reimbursements."
+            );
+        }
+
+        return repo.findByUserIdAndStatus(requester.getId(), status);
+    }
 }

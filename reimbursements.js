@@ -9,16 +9,18 @@ const currentUser = JSON.parse(storedUser);
 document.getElementById("welcomeMsg").textContent =
     "Welcome, " + currentUser.username;
 
-async function loadReimbursements() {
+async function loadReimbursements(status = "ALL") {
     try {
-        const response = await fetch(
-            `/api/reimbursements/${currentUser.id}`,
-            {
-                method: "GET",
-                credentials: "include"
-            }
-        );
+        let url = `/api/reimbursements/${currentUser.id}`;
 
+    if (status !== "ALL") {
+        url += `/status/${status}`;
+    }
+
+    const response = await fetch(url, {
+        method: "GET",
+        credentials: "include"
+    });
         const reimbursementList =
             document.getElementById("reimbursementList");
 
@@ -154,6 +156,10 @@ document.getElementById("logoutBtn")
         } catch (err) {
             console.error("Logout error:", err);
         }
+    });
+document.getElementById("statusFilter")
+    .addEventListener("change", function () {
+        loadReimbursements(this.value);
     });
 
 loadReimbursements();

@@ -7,6 +7,7 @@ import com.aishwarya.ers.model.Role;
 import com.aishwarya.ers.repository.ReimbursementRepository;
 import com.aishwarya.ers.repository.UserRepository;
 import com.aishwarya.ers.service.ReimbursementService;
+import com.aishwarya.ers.exception.ForbiddenException;
 import io.javalin.http.Context;
 
 import java.util.List;
@@ -58,19 +59,30 @@ public class ReimbursementController {
     }
 
     public static void getById(Context ctx) {
+        UserResponseDTO loggedInUser = ctx.sessionAttribute("currentUser");
+
+        if (loggedInUser == null) {
+            ctx.status(401).result("Not logged in");
+            return;
+        }
+
         try {
-            int userId = Integer.parseInt(ctx.pathParam("id"));
+            int targetUserId = Integer.parseInt(ctx.pathParam("id"));
 
-            List<Reimbursement> reimbursements = service.getByUserId(userId, userId);
+            List<Reimbursement> reimbursements =
+                    service.getByUserId(
+                            targetUserId,
+                            loggedInUser.getId()
+                    );
 
-            if (reimbursements == null || reimbursements.isEmpty()) {
-                ctx.status(404).result("No reimbursements found for user ID " + userId);
-                return;
-            }
+            ctx.status(200).json(reimbursements);
 
-            ctx.json(reimbursements);
         } catch (NumberFormatException e) {
-            ctx.status(400).result("Invalid ID format");
+            ctx.status(400).result("Invalid user ID");
+        } catch (ForbiddenException e) {
+            ctx.status(403).result(e.getMessage());
+        } catch (IllegalArgumentException e) {
+            ctx.status(400).result(e.getMessage());
         }
     }
 
@@ -138,5 +150,37 @@ public class ReimbursementController {
             return;
         }
         ctx.json(reimbursements);
+    }
+    public static void getByUserIdAndStatus(Context ctx) {
+        UserResponseDTO loggedInUser = ctx.sessionAttribute("currentUser");
+
+        if (loggedInUser == null) {
+            ctx.status(401).result("Not logged in");
+            return;
+        }
+
+        try {
+            int targetUserId = Integer.parseInt(ctx.pathParam("id"));
+
+            ReimbursementStatus status = ReimbursementStatus.valueOf(
+                    ctx.pathParam("status").toUpperCase()
+            );
+
+            List<Reimbursement> reimbursements =
+                    service.getByUserIdAndStatus(
+                            targetUserId,
+                            loggedInUser.getId(),
+                            status
+                    );
+
+            ctx.json(reimbursements);
+
+        } catch (NumberFormatException e) {
+            ctx.status(400).result("Invalid user ID");
+        } catch (IllegalArgumentException e) {
+            ctx.status(400).result("Invalid reimbursement status");
+        } catch (ForbiddenException e) {
+            ctx.status(403).result(e.getMessage());
+        }
     }
 }

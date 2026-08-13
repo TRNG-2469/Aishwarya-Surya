@@ -78,11 +78,17 @@ public class Main {
         app.get("/api/reimbursements", ReimbursementController::getAll);
         app.post("/api/reimbursements", ReimbursementController::submit);
 
+        app.get(
+                "/api/reimbursements/{id}/status/{status}",
+                ReimbursementController::getByUserIdAndStatus
+        );
+
         app.post("/logout", ctx -> {
             ctx.req().getSession().invalidate();
             ctx.status(200).result("Logged out successfully");
         });
 
         app.start(8080);
+
     }
 }
