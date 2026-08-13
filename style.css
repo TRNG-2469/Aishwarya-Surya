@@ -1,3 +1,7 @@
+* {
+    box-sizing: border-box;
+}
+
 body {
     display: flex;
     flex-direction: column;
@@ -5,6 +9,12 @@ body {
     align-items: center;
     min-height: 100vh;
     margin: 0;
+    gap: 12px;
+    background-color: lightgreen;
+}
+
+table, thead, tbody, tfoot, tr, th, td {
+    background-color: white;
 }
 
 #authForm {
@@ -28,4 +38,60 @@ body {
     width: 100%;
     box-sizing: border-box;
     padding: 6px;
+}
+
+button {
+    padding: 8px 14px;
+    margin: 6px 4px;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+
+#reimbursementList {
+    width: 100%;
+    max-width: 800px;
+    margin: 16px 0;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0;
+}
+
+table th,
+table td {
+    border: 1px solid #000;
+    padding: 8px 12px;
+    text-align: left;
+    vertical-align: middle;
+}
+
+table th {
+    background-color: #f2f2f2;
+}
+
+table td button {
+    padding: 6px 10px;
+    margin-right: 6px;
+    box-sizing: border-box;
+}
+
+table td button:last-child {
+    margin-right: 0;
+}
+
+#logoutBtn {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    margin: 0;
+}
+
+#managerViewBtn,
+#backBtn {
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    margin: 0;
 }
