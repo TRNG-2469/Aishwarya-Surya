@@ -173,6 +173,8 @@ public class ReimbursementController {
 
         } catch (NumberFormatException e) {
             ctx.status(400).result("Invalid reimbursement ID");
+        } catch (ForbiddenException e) {
+            ctx.status(403).result(e.getMessage());
         } catch (RuntimeException e) {
             ctx.status(400).result(e.getMessage());
         }
@@ -195,6 +197,8 @@ public class ReimbursementController {
 
         } catch (NumberFormatException e) {
             ctx.status(400).result("Invalid reimbursement ID");
+        } catch (ForbiddenException e) {
+            ctx.status(403).result(e.getMessage());
         } catch (RuntimeException e) {
             ctx.status(400).result(e.getMessage());
         }

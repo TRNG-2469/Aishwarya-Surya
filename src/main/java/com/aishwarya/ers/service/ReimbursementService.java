@@ -115,6 +115,18 @@ public class ReimbursementService {
             );
         }
 
+        Reimbursement reimbursement = repo.findById(id);
+
+        if (reimbursement == null) {
+            throw new ReimbursementNotFoundException("No reimbursement with id " + id);
+        }
+
+        if (reimbursement.getUserId() == resolverId) {
+            throw new ForbiddenException(
+                    "Managers cannot " + action + " their own reimbursement requests"
+            );
+        }
+
         if (!repo.resolve(id, status, resolverId))
             throw new RuntimeException("Could not " + action + " reimbursement with id " + id
                     + " (it may not exist or is no longer pending)");
