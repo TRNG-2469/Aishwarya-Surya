@@ -85,7 +85,81 @@ async function loadAllReimbursements(status = "", department = "") {
                 r.status +
                 (r.resolverId
                     ? " | Resolved by #" + r.resolverId
-                    : "");
+                    : "") +
+                " ";
+
+            if (r.status === "PENDING") {
+                const approveBtn = document.createElement("button");
+                approveBtn.textContent = "Approve";
+
+                approveBtn.addEventListener("click", async function () {
+                    try {
+                        const response = await fetch(
+                            `/api/reimbursements/${r.id}/approve`,
+                            {
+                                method: "PUT",
+                                credentials: "include"
+                            }
+                        );
+
+                        if (response.ok) {
+                            alert("Reimbursement approved.");
+
+                            const status =
+                                document.getElementById("statusFilter").value;
+
+                            const department =
+                                document.getElementById("departmentFilter").value.trim();
+
+                            loadAllReimbursements(status, department);
+                        } else {
+                            const errorText = await response.text();
+                            alert(errorText || "Unable to approve reimbursement.");
+                        }
+
+                    } catch (err) {
+                        console.error("Approve error:", err);
+                        alert("Unable to connect to the server.");
+                    }
+                });
+
+                const denyBtn = document.createElement("button");
+                denyBtn.textContent = "Deny";
+
+                denyBtn.addEventListener("click", async function () {
+                    try {
+                        const response = await fetch(
+                            `/api/reimbursements/${r.id}/deny`,
+                            {
+                                method: "PUT",
+                                credentials: "include"
+                            }
+                        );
+
+                        if (response.ok) {
+                            alert("Reimbursement denied.");
+
+                            const status =
+                                document.getElementById("statusFilter").value;
+
+                            const department =
+                                document.getElementById("departmentFilter").value.trim();
+
+                            loadAllReimbursements(status, department);
+                        } else {
+                            const errorText = await response.text();
+                            alert(errorText || "Unable to deny reimbursement.");
+                        }
+
+                    } catch (err) {
+                        console.error("Deny error:", err);
+                        alert("Unable to connect to the server.");
+                    }
+                });
+
+                item.appendChild(approveBtn);
+                item.appendChild(denyBtn);
+            }
 
             reimbursementList.appendChild(item);
         });

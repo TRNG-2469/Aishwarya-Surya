@@ -156,18 +156,48 @@ public class ReimbursementController {
             ctx.status(400).result(e.getMessage());
         }
     }
-    public void approve(Context ctx) {
-        int id = Integer.parseInt(ctx.pathParam("id"));
-        int resolverId = Integer.parseInt(ctx.queryParam("resolverId"));
-        service.approve(id, resolverId);
-        ctx.status(204);
+    public static void approve(Context ctx) {
+        UserResponseDTO loggedInUser = ctx.sessionAttribute("currentUser");
+
+        if (loggedInUser == null) {
+            ctx.status(401).result("Not logged in");
+            return;
+        }
+
+        try {
+            int id = Integer.parseInt(ctx.pathParam("id"));
+
+            service.approve(id, loggedInUser.getId());
+
+            ctx.status(204);
+
+        } catch (NumberFormatException e) {
+            ctx.status(400).result("Invalid reimbursement ID");
+        } catch (RuntimeException e) {
+            ctx.status(400).result(e.getMessage());
+        }
     }
 
-    public void deny(Context ctx) {
-        int id = Integer.parseInt(ctx.pathParam("id"));
-        int resolverId = Integer.parseInt(ctx.queryParam("resolverId"));
-        service.deny(id, resolverId);
-        ctx.status(204);
+    public static void deny(Context ctx) {
+        UserResponseDTO loggedInUser = ctx.sessionAttribute("currentUser");
+
+        if (loggedInUser == null) {
+            ctx.status(401).result("Not logged in");
+            return;
+        }
+
+        try {
+            int id = Integer.parseInt(ctx.pathParam("id"));
+
+            service.deny(id, loggedInUser.getId());
+
+            ctx.status(204);
+
+        } catch (NumberFormatException e) {
+            ctx.status(400).result("Invalid reimbursement ID");
+        } catch (RuntimeException e) {
+            ctx.status(400).result(e.getMessage());
+        }
     }
 
     public static void getAll(Context ctx) {

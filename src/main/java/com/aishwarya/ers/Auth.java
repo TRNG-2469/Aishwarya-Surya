@@ -85,6 +85,16 @@ public class Auth {
                 ReimbursementController::updatePending
         );
 
+        app.put(
+                "/api/reimbursements/{id}/approve",
+                ReimbursementController::approve
+        );
+
+        app.put(
+                "/api/reimbursements/{id}/deny",
+                ReimbursementController::deny
+        );
+
         app.get(
                 "/api/reimbursements/{id}/status/{status}",
                 ReimbursementController::getByUserIdAndStatus
