@@ -1,18 +1,17 @@
-package com.aishwarya.ers.util;
-
 import com.aishwarya.ers.model.Reimbursement;
 import com.aishwarya.ers.model.ReimbursementStatus;
 import com.aishwarya.ers.model.ReimbursementType;
+import com.aishwarya.ers.model.User;
 import com.aishwarya.ers.repository.ReimbursementRepository;
 import com.aishwarya.ers.repository.UserRepository;
-import com.aishwarya.ers.model.User;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 public class ReimbursementRepositoryTest {
-
-    public static void main(String[] args) {
+    @Test
+    public void main() {
 
         UserRepository userRepository = new UserRepository();
         ReimbursementRepository reimbursementRepository =
@@ -59,5 +58,6 @@ public class ReimbursementRepositoryTest {
                 "Number of reimbursements for testuser1: "
                         + userReimbursements.size()
         );
+
     }
 }

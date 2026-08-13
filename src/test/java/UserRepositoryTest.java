@@ -1,12 +1,12 @@
-package com.aishwarya.ers.util;
-
 import com.aishwarya.ers.model.Role;
 import com.aishwarya.ers.model.User;
 import com.aishwarya.ers.repository.UserRepository;
+import org.junit.jupiter.api.Test;
 import org.mindrot.jbcrypt.BCrypt;
 
 public class UserRepositoryTest {
-    public static void main(String[] args) {
+    @Test
+    public void main() {
         UserRepository repository = new UserRepository();
         User user = new User();
         user.setUsername("ScaryFinalEvilBoss");

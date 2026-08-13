@@ -10,6 +10,17 @@ document.getElementById("welcomeMsg").textContent =
     "Welcome, " + currentUser.username;
 
 async function loadReimbursements(status = "ALL") {
+
+if (currentUser.role === "MANAGER") {
+    const managerViewBtn = document.getElementById("managerViewBtn");
+    managerViewBtn.style.display = "inline-block";
+    managerViewBtn.addEventListener("click", function () {
+        window.location.href = "/all-reimbursements.html";
+    });
+}
+
+async function loadReimbursements() {
+
     try {
         let url = `/api/reimbursements/${currentUser.id}`;
 

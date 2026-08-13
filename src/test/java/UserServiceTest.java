@@ -1,15 +1,14 @@
-package com.aishwarya.ers.util;
-
-import com.aishwarya.ers.model.User;
 import com.aishwarya.ers.dto.UserResponseDTO;
+import com.aishwarya.ers.model.User;
 import com.aishwarya.ers.repository.UserRepository;
 import com.aishwarya.ers.service.UserService;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 public class UserServiceTest {
-
-    public static void main(String[] args) {
+    @Test
+    public void main() {
 
         UserService userService = new UserService(new UserRepository());
 
