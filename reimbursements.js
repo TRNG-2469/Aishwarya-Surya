@@ -9,29 +9,35 @@ const currentUser = JSON.parse(storedUser);
 document.getElementById("welcomeMsg").textContent =
     "Welcome, " + currentUser.username;
 
-async function loadReimbursements(status = "ALL") {
 
+// Manager button
 if (currentUser.role === "MANAGER") {
     const managerViewBtn = document.getElementById("managerViewBtn");
-    managerViewBtn.style.display = "inline-block";
-    managerViewBtn.addEventListener("click", function () {
-        window.location.href = "/all-reimbursements.html";
-    });
+
+    if (managerViewBtn) {
+        managerViewBtn.style.display = "inline-block";
+
+        managerViewBtn.addEventListener("click", function () {
+            window.location.href = "/all-reimbursements.html";
+        });
+    }
 }
 
-async function loadReimbursements() {
 
+// Load reimbursements
+async function loadReimbursements(status = "ALL") {
     try {
         let url = `/api/reimbursements/${currentUser.id}`;
 
-    if (status !== "ALL") {
-        url += `/status/${status}`;
-    }
+        if (status !== "ALL") {
+            url += `/status/${status}`;
+        }
 
-    const response = await fetch(url, {
-        method: "GET",
-        credentials: "include"
-    });
+        const response = await fetch(url, {
+            method: "GET",
+            credentials: "include"
+        });
+
         const reimbursementList =
             document.getElementById("reimbursementList");
 
@@ -43,8 +49,10 @@ async function loadReimbursements() {
 
         if (!response.ok) {
             const errorText = await response.text();
+
             reimbursementList.textContent =
                 errorText || "Unable to load reimbursements.";
+
             return;
         }
 
@@ -81,6 +89,8 @@ async function loadReimbursements() {
     }
 }
 
+
+// Submit reimbursement
 document.getElementById("reimbursementForm")
     .addEventListener("submit", async function (e) {
 
@@ -101,21 +111,18 @@ document.getElementById("reimbursementForm")
         reimbursementMsg.textContent = "";
 
         try {
-            const response = await fetch(
-                "/api/reimbursements",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    credentials: "include",
-                    body: JSON.stringify({
-                        amount: amount,
-                        description: description,
-                        type: type
-                    })
-                }
-            );
+            const response = await fetch("/api/reimbursements", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                credentials: "include",
+                body: JSON.stringify({
+                    amount: amount,
+                    description: description,
+                    type: type
+                })
+            });
 
             if (response.ok) {
                 const reimbursement = await response.json();
@@ -126,51 +133,56 @@ document.getElementById("reimbursementForm")
 
                 document.getElementById("reimbursementForm").reset();
 
-                loadReimbursements();
+                const selectedStatus =
+                    document.getElementById("statusFilter").value;
+
+                loadReimbursements(selectedStatus);
 
             } else {
                 const errorText = await response.text();
 
                 reimbursementMsg.textContent =
-                    errorText ||
-                    "Unable to submit reimbursement.";
+                    errorText || "Unable to submit reimbursement.";
             }
 
         } catch (err) {
-            console.error(
-                "Reimbursement submission error:",
-                err
-            );
+            console.error("Reimbursement submission error:", err);
 
             reimbursementMsg.textContent =
                 "Unable to connect to the server.";
         }
     });
 
+
+// Logout
 document.getElementById("logoutBtn")
     .addEventListener("click", async function () {
 
         try {
-            const response = await fetch(
-                "/logout",
-                {
-                    method: "POST",
-                    credentials: "include"
-                }
-            );
+            const response = await fetch("/logout", {
+                method: "POST",
+                credentials: "include"
+            });
 
             if (response.ok) {
                 localStorage.removeItem("currentUser");
                 window.location.href = "/";
+            } else {
+                console.error("Logout failed:", response.status);
             }
 
         } catch (err) {
             console.error("Logout error:", err);
         }
     });
+
+
+// Status filter
 document.getElementById("statusFilter")
     .addEventListener("change", function () {
         loadReimbursements(this.value);
     });
 
-loadReimbursements(); }
+
+// Initial load
+loadReimbursements();
