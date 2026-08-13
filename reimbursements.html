@@ -12,6 +12,19 @@
 
 <p id="welcomeMsg"></p>
 
+<h2>My Reimbursements</h2>
+
+<label for="statusFilter">Filter by status:</label>
+
+<select id="statusFilter">
+    <option value="ALL">All</option>
+    <option value="PENDING">Pending</option>
+    <option value="APPROVED">Approved</option>
+    <option value="DENIED">Denied</option>
+</select>
+
+<div id="reimbursementList"></div>
+
 <h2>Submit Reimbursement</h2>
 
 <form id="reimbursementForm">
@@ -43,19 +56,6 @@
 </form>
 
 <p id="reimbursementMsg"></p>
-
-<h2>My Reimbursements</h2>
-
-<label for="statusFilter">Filter by status:</label>
-
-<select id="statusFilter">
-    <option value="ALL">All</option>
-    <option value="PENDING">Pending</option>
-    <option value="APPROVED">Approved</option>
-    <option value="DENIED">Denied</option>
-</select>
-
-<div id="reimbursementList"></div>
 
 <button id="logoutBtn">Logout</button>
 <button id="managerViewBtn" style="display:none;">  View All Reimbursements</button>

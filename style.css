@@ -10,6 +10,11 @@ body {
     min-height: 100vh;
     margin: 0;
     gap: 12px;
+    background-color: lightgreen;
+}
+
+table, thead, tbody, tfoot, tr, th, td {
+    background-color: white;
 }
 
 #authForm {
