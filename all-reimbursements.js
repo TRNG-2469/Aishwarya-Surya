@@ -14,15 +14,28 @@ document.getElementById("backBtn")
         window.location.href = "/reimbursements.html";
     });
 
-async function loadAllReimbursements() {
+async function loadAllReimbursements(status = "", department = "") {
     try {
-        const response = await fetch(
-            "/api/reimbursements",
-            {
-                method: "GET",
-                credentials: "include"
+        let url = "/api/reimbursements";
+
+        if (status || department) {
+            const params = new URLSearchParams();
+
+            if (status) {
+                params.append("status", status);
             }
-        );
+
+            if (department) {
+                params.append("department", department);
+            }
+
+            url = `/api/reimbursements/filter?${params.toString()}`;
+        }
+
+        const response = await fetch(url, {
+            method: "GET",
+            credentials: "include"
+        });
 
         const reimbursementList =
             document.getElementById("reimbursementList");
@@ -41,8 +54,10 @@ async function loadAllReimbursements() {
 
         if (!response.ok) {
             const errorText = await response.text();
+
             reimbursementList.textContent =
                 errorText || "Unable to load reimbursements.";
+
             return;
         }
 
@@ -68,7 +83,9 @@ async function loadAllReimbursements() {
                 r.type +
                 " | " +
                 r.status +
-                (r.resolverId ? " | Resolved by #" + r.resolverId : "");
+                (r.resolverId
+                    ? " | Resolved by #" + r.resolverId
+                    : "");
 
             reimbursementList.appendChild(item);
         });
@@ -80,6 +97,26 @@ async function loadAllReimbursements() {
             "Unable to connect to the server.";
     }
 }
+document.getElementById("filterBtn")
+    .addEventListener("click", function () {
+
+        const status =
+            document.getElementById("statusFilter").value;
+
+        const department =
+            document.getElementById("departmentFilter").value.trim();
+
+        loadAllReimbursements(status, department);
+    });
+
+document.getElementById("clearFilterBtn")
+    .addEventListener("click", function () {
+
+        document.getElementById("statusFilter").value = "";
+        document.getElementById("departmentFilter").value = "";
+
+        loadAllReimbursements();
+    });
 
 document.getElementById("logoutBtn")
     .addEventListener("click", async function () {

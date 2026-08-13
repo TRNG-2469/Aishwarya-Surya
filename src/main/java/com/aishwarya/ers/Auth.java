@@ -71,6 +71,11 @@ public class Auth {
             }
         });
 
+        app.get(
+                "/api/reimbursements/filter",
+                ReimbursementController::getFiltered
+        );
+
         app.get("/api/reimbursements/{id}", ReimbursementController::getById);
         app.get("/api/reimbursements", ReimbursementController::getAll);
         app.post("/api/reimbursements", ReimbursementController::submit);

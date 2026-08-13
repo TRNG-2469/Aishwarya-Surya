@@ -12,6 +12,26 @@
 
 <p id="welcomeMsg"></p>
 
+<div>
+    <label for="statusFilter">Status:</label>
+    <select id="statusFilter">
+        <option value="">All</option>
+        <option value="PENDING">Pending</option>
+        <option value="APPROVED">Approved</option>
+        <option value="DENIED">Denied</option>
+    </select>
+
+    <label for="departmentFilter">Department:</label>
+    <input
+            type="text"
+            id="departmentFilter"
+            placeholder="e.g. Sales"
+    >
+
+    <button id="filterBtn">Apply Filters</button>
+    <button id="clearFilterBtn">Clear Filters</button>
+</div>
+
 <div id="reimbursementList"></div>
 
 <button id="logoutBtn">Logout</button>

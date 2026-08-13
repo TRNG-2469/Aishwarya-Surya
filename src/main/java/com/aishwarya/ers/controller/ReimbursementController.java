@@ -45,17 +45,36 @@ public class ReimbursementController {
         }
     }
 
-    public void getFiltered(Context ctx) {
-        int callerId = Integer.parseInt(ctx.queryParam("callerId"));
-        String statusParam = ctx.queryParam("status");
-        String department = ctx.queryParam("department");
+    public static void getFiltered(Context ctx) {
+        UserResponseDTO loggedInUser = ctx.sessionAttribute("currentUser");
 
-        ReimbursementStatus status = statusParam != null
-                ? ReimbursementStatus.valueOf(statusParam.toUpperCase())
-                : null;
+        if (loggedInUser == null) {
+            ctx.status(401).result("Not logged in");
+            return;
+        }
 
-        List<Reimbursement> reimbursements = service.getByFilters(callerId, status, department);
-        ctx.json(reimbursements);
+        try {
+            String statusParam = ctx.queryParam("status");
+            String department = ctx.queryParam("department");
+
+            ReimbursementStatus status = statusParam != null && !statusParam.isBlank()
+                    ? ReimbursementStatus.valueOf(statusParam.toUpperCase())
+                    : null;
+
+            List<Reimbursement> reimbursements =
+                    service.getByFilters(
+                            loggedInUser.getId(),
+                            status,
+                            department
+                    );
+
+            ctx.status(200).json(reimbursements);
+
+        } catch (ForbiddenException e) {
+            ctx.status(403).result(e.getMessage());
+        } catch (IllegalArgumentException e) {
+            ctx.status(400).result(e.getMessage());
+        }
     }
 
     public static void getById(Context ctx) {
