@@ -75,3 +75,18 @@ table td button {
 table td button:last-child {
     margin-right: 0;
 }
+
+#logoutBtn {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    margin: 0;
+}
+
+#managerViewBtn,
+#backBtn {
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    margin: 0;
+}
