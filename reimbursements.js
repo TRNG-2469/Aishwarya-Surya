@@ -76,7 +76,78 @@ async function loadReimbursements(status = "ALL") {
                 " | " +
                 r.type +
                 " | " +
-                r.status;
+                r.status +
+                " ";
+
+            if (r.status === "PENDING") {
+                const editBtn = document.createElement("button");
+                editBtn.textContent = "Edit";
+
+                editBtn.addEventListener("click", async function () {
+                    const newAmount = prompt(
+                        "Enter new amount:",
+                        r.amount
+                    );
+
+                    if (newAmount === null) {
+                        return;
+                    }
+
+                    const newDescription = prompt(
+                        "Enter new description:",
+                        r.description
+                    );
+
+                    if (newDescription === null) {
+                        return;
+                    }
+
+                    const newType = prompt(
+                        "Enter reimbursement type:",
+                        r.type
+                    );
+
+                    if (newType === null) {
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch(
+                            `/api/reimbursements/${r.id}`,
+                            {
+                                method: "PUT",
+                                headers: {
+                                    "Content-Type": "application/json"
+                                },
+                                credentials: "include",
+                                body: JSON.stringify({
+                                    amount: parseFloat(newAmount),
+                                    description: newDescription,
+                                    type: newType.toUpperCase()
+                                })
+                            }
+                        );
+
+                        if (response.ok) {
+                            alert("Reimbursement updated successfully.");
+
+                            const selectedStatus =
+                                document.getElementById("statusFilter").value;
+
+                            loadReimbursements(selectedStatus);
+                        } else {
+                            const errorText = await response.text();
+                            alert(errorText || "Unable to update reimbursement.");
+                        }
+
+                    } catch (err) {
+                        console.error("Update reimbursement error:", err);
+                        alert("Unable to connect to the server.");
+                    }
+                });
+
+                item.appendChild(editBtn);
+            }
 
             reimbursementList.appendChild(item);
         });
