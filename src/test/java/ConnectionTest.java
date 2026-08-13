@@ -1,11 +1,12 @@
-package com.aishwarya.ers.util;
+
+import com.aishwarya.ers.util.ConnectionFactory;
+import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
 
 public class ConnectionTest {
-
-    public static void main(String[] args) {
-
+    @Test
+    public void getConnectionTest() {
         try (Connection connection = ConnectionFactory.getConnection()) {
 
             if (connection != null) {
@@ -15,5 +16,6 @@ public class ConnectionTest {
         } catch (Exception e) {
             e.getMessage();
         }
+
     }
 }
