@@ -66,18 +66,44 @@ async function loadReimbursements(status = "ALL") {
             return;
         }
 
-        reimbursements.forEach(function (r) {
-            const item = document.createElement("p");
+        const table = document.createElement("table");
 
-            item.textContent =
-                "$" + r.amount +
-                " | " +
-                r.description +
-                " | " +
-                r.type +
-                " | " +
-                r.status +
-                " ";
+        const thead = document.createElement("thead");
+        const headerRow = document.createElement("tr");
+
+        ["Amount", "Description", "Type", "Status", "Action"].forEach(
+            function (headerText) {
+                const th = document.createElement("th");
+                th.textContent = headerText;
+                headerRow.appendChild(th);
+            }
+        );
+
+        thead.appendChild(headerRow);
+        table.appendChild(thead);
+
+        const tbody = document.createElement("tbody");
+
+        reimbursements.forEach(function (r) {
+            const row = document.createElement("tr");
+
+            const amountCell = document.createElement("td");
+            amountCell.textContent = "$" + r.amount;
+            row.appendChild(amountCell);
+
+            const descriptionCell = document.createElement("td");
+            descriptionCell.textContent = r.description;
+            row.appendChild(descriptionCell);
+
+            const typeCell = document.createElement("td");
+            typeCell.textContent = r.type;
+            row.appendChild(typeCell);
+
+            const statusCell = document.createElement("td");
+            statusCell.textContent = r.status;
+            row.appendChild(statusCell);
+
+            const actionCell = document.createElement("td");
 
             if (r.status === "PENDING") {
                 const editBtn = document.createElement("button");
@@ -146,11 +172,15 @@ async function loadReimbursements(status = "ALL") {
                     }
                 });
 
-                item.appendChild(editBtn);
+                actionCell.appendChild(editBtn);
             }
 
-            reimbursementList.appendChild(item);
+            row.appendChild(actionCell);
+            tbody.appendChild(row);
         });
+
+        table.appendChild(tbody);
+        reimbursementList.appendChild(table);
 
     } catch (err) {
         console.error("Error loading reimbursements:", err);
@@ -257,4 +287,3 @@ document.getElementById("statusFilter")
 
 // Initial load
 loadReimbursements();
-

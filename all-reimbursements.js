@@ -71,22 +71,59 @@ async function loadAllReimbursements(status = "", department = "") {
             return;
         }
 
-        reimbursements.forEach(function (r) {
-            const item = document.createElement("p");
+        const table = document.createElement("table");
 
-            item.textContent =
-                "User #" + r.userId +
-                " | $" + r.amount +
-                " | " +
-                r.description +
-                " | " +
-                r.type +
-                " | " +
-                r.status +
-                (r.resolverId
-                    ? " | Resolved by #" + r.resolverId
-                    : "") +
-                " ";
+        const thead = document.createElement("thead");
+        const headerRow = document.createElement("tr");
+
+        [
+            "User",
+            "Amount",
+            "Description",
+            "Type",
+            "Status",
+            "Resolved By",
+            "Action"
+        ].forEach(function (headerText) {
+            const th = document.createElement("th");
+            th.textContent = headerText;
+            headerRow.appendChild(th);
+        });
+
+        thead.appendChild(headerRow);
+        table.appendChild(thead);
+
+        const tbody = document.createElement("tbody");
+
+        reimbursements.forEach(function (r) {
+            const row = document.createElement("tr");
+
+            const userCell = document.createElement("td");
+            userCell.textContent = "#" + r.userId;
+            row.appendChild(userCell);
+
+            const amountCell = document.createElement("td");
+            amountCell.textContent = "$" + r.amount;
+            row.appendChild(amountCell);
+
+            const descriptionCell = document.createElement("td");
+            descriptionCell.textContent = r.description;
+            row.appendChild(descriptionCell);
+
+            const typeCell = document.createElement("td");
+            typeCell.textContent = r.type;
+            row.appendChild(typeCell);
+
+            const statusCell = document.createElement("td");
+            statusCell.textContent = r.status;
+            row.appendChild(statusCell);
+
+            const resolvedCell = document.createElement("td");
+            resolvedCell.textContent =
+                r.resolverId ? "#" + r.resolverId : "-";
+            row.appendChild(resolvedCell);
+
+            const actionCell = document.createElement("td");
 
             if (r.status === "PENDING") {
                 const approveBtn = document.createElement("button");
@@ -157,12 +194,16 @@ async function loadAllReimbursements(status = "", department = "") {
                     }
                 });
 
-                item.appendChild(approveBtn);
-                item.appendChild(denyBtn);
+                actionCell.appendChild(approveBtn);
+                actionCell.appendChild(denyBtn);
             }
 
-            reimbursementList.appendChild(item);
+            row.appendChild(actionCell);
+            tbody.appendChild(row);
         });
+
+        table.appendChild(tbody);
+        reimbursementList.appendChild(table);
 
     } catch (err) {
         console.error("Error loading reimbursements:", err);
