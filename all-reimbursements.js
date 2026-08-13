@@ -197,7 +197,7 @@ document.getElementById("logoutBtn")
 
         try {
             const response = await fetch(
-                "/logout",
+                "/api/auth/logout",
                 {
                     method: "POST",
                     credentials: "include"

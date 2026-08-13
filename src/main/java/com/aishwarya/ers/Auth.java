@@ -15,59 +15,54 @@ public class Auth {
         UserRepository repo = new UserRepository();
         UserService userService = new UserService(repo);
 
-        app.post("/", ctx -> {
+        app.post("/api/auth/login", ctx -> {
             JsonNode body = ctx.bodyAsClass(JsonNode.class);
 
-            if (body == null || !body.has("action")) {
-                ctx.status(400).result("Bad Request: Missing action");
+            if (body == null || !body.has("username") || !body.has("password")) {
+                ctx.status(400).result("Bad Request: Username and password are required");
                 return;
             }
 
+            try {
+                String username = body.get("username").asText();
+                String password = body.get("password").asText();
 
-            String action = body.get("action").asText();
+                UserResponseDTO user = userService.login(username, password);
 
-            if ("login".equalsIgnoreCase(action)) {
-                if (!body.has("username") || !body.has("password")) {
-                    ctx.status(400).result("Bad Request: Username and password are required");
-                    return;
+                ctx.sessionAttribute("currentUser", user);
+                ctx.status(200).json(user);
+
+            } catch (RuntimeException e) {
+                ctx.status(401).result("Invalid credentials");
+            }
+        });
+
+        app.post("/api/auth/register", ctx -> {
+            JsonNode body = ctx.bodyAsClass(JsonNode.class);
+
+            if (body == null || !body.has("username") || !body.has("password")) {
+                ctx.status(400).result("Bad Request: Username and password are required");
+                return;
+            }
+
+            try {
+                User newUser = new User();
+
+                newUser.setUsername(body.get("username").asText());
+
+                if (body.has("department")) {
+                    newUser.setDepartment(body.get("department").asText());
                 }
 
-                try {
-                    String username = body.get("username").asText();
-                    String password = body.get("password").asText();
+                String plainPassword = body.get("password").asText();
 
-                    UserResponseDTO user = userService.login(username, password);
+                UserResponseDTO createdUser =
+                        userService.register(newUser, plainPassword);
 
-                    ctx.sessionAttribute("currentUser", user);
-                    ctx.status(200).json(user);
+                ctx.status(201).json(createdUser);
 
-                } catch (RuntimeException e) {
-                    ctx.status(401).result("Invalid credentials");
-                }
-
-            } else if ("register".equalsIgnoreCase(action)) {
-                if (!body.has("username") || !body.has("password")) {
-                    ctx.status(400).result("Bad Request: Username and password are required");
-                    return;
-                }
-
-                try {
-                    User newUser = new User();
-                    newUser.setUsername(body.get("username").asText());
-                    if (body.has("department")) newUser.setDepartment(body.get("department").asText());
-
-                    String plainPassword = body.get("password").asText();
-
-                    UserResponseDTO createdUser = userService.register(newUser, plainPassword);
-
-                    ctx.status(201).json(createdUser);
-
-                } catch (IllegalArgumentException e) {
-                    ctx.status(400).result(e.getMessage());
-                }
-
-            } else {
-                ctx.status(400).result("Bad Request: Invalid action");
+            } catch (IllegalArgumentException e) {
+                ctx.status(400).result(e.getMessage());
             }
         });
 
@@ -100,7 +95,7 @@ public class Auth {
                 ReimbursementController::getByUserIdAndStatus
         );
 
-        app.post("/logout", ctx -> {
+        app.post("/api/auth/logout", ctx -> {
             ctx.req().getSession().invalidate();
             ctx.status(200).result("Logged out successfully");
         });

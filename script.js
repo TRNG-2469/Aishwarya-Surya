@@ -35,14 +35,13 @@ document.getElementById("authForm").addEventListener("submit", async function (e
         const department = document.getElementById("department").value;
 
         try {
-            const response = await fetch("/", {
+            const response = await fetch("/api/auth/register", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
                 credentials: "include",
                 body: JSON.stringify({
-                    action: "register",
                     username: username,
                     password: password,
                     department: department
@@ -73,14 +72,13 @@ document.getElementById("authForm").addEventListener("submit", async function (e
 
     } else {
         try {
-            const response = await fetch("/", {
+            const response = await fetch("/api/auth/login", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
                 credentials: "include",
                 body: JSON.stringify({
-                    action: "login",
                     username: username,
                     password: password
                 })

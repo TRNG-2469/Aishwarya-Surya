@@ -230,7 +230,7 @@ document.getElementById("logoutBtn")
     .addEventListener("click", async function () {
 
         try {
-            const response = await fetch("/logout", {
+            const response = await fetch("/api/auth/logout", {
                 method: "POST",
                 credentials: "include"
             });
