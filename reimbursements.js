@@ -109,33 +109,58 @@ async function loadReimbursements(status = "ALL") {
                 const editBtn = document.createElement("button");
                 editBtn.textContent = "Edit";
 
+                let isEditing = false;
+
                 editBtn.addEventListener("click", async function () {
-                    const newAmount = prompt(
-                        "Enter new amount:",
-                        r.amount
-                    );
 
-                    if (newAmount === null) {
+                    // --- Enter edit mode: swap cells for inputs ---
+                    if (!isEditing) {
+                        isEditing = true;
+
+                        const amountInput = document.createElement("input");
+                        amountInput.type = "number";
+                        amountInput.step = "0.01";
+                        amountInput.value = r.amount;
+
+                        const descriptionInput = document.createElement("input");
+                        descriptionInput.type = "text";
+                        descriptionInput.value = r.description;
+
+                        const typeInput = document.createElement("select");
+
+                        ["TRAVEL", "MEALS", "LODGING", "OTHER"].forEach(function (optionValue) {
+                            const option = document.createElement("option");
+                            option.value = optionValue;
+                            option.textContent = optionValue;
+
+                            if (optionValue === r.type) {
+                                option.selected = true;
+                            }
+
+                            typeInput.appendChild(option);
+                        });
+
+                        amountCell.textContent = "";
+                        amountCell.appendChild(amountInput);
+
+                        descriptionCell.textContent = "";
+                        descriptionCell.appendChild(descriptionInput);
+
+                        typeCell.textContent = "";
+                        typeCell.appendChild(typeInput);
+
+                        editBtn.textContent = "Submit";
                         return;
                     }
 
-                    const newDescription = prompt(
-                        "Enter new description:",
-                        r.description
-                    );
+                    // --- Submit mode: read inputs and send PUT ---
+                    const amountInput = amountCell.querySelector("input");
+                    const descriptionInput = descriptionCell.querySelector("input");
+                    const typeInput = typeCell.querySelector("select");
 
-                    if (newDescription === null) {
-                        return;
-                    }
-
-                    const newType = prompt(
-                        "Enter reimbursement type:",
-                        r.type
-                    );
-
-                    if (newType === null) {
-                        return;
-                    }
+                    const newAmount = amountInput.value;
+                    const newDescription = descriptionInput.value;
+                    const newType = typeInput.value;
 
                     try {
                         const response = await fetch(
