@@ -6,9 +6,6 @@ if (!storedUser) {
 
 const currentUser = JSON.parse(storedUser);
 
-document.getElementById("welcomeMsg").textContent =
-    "Welcome, " + currentUser.username;
-
 document.getElementById("backBtn")
     .addEventListener("click", function () {
         window.location.href = "/reimbursements.html";
