@@ -111,9 +111,15 @@ table td button:last-child {
     margin-right: 0;
 }
 
-/* Cleaned up old absolute position styles */
 #logoutBtn,
 #managerViewBtn,
 #backBtn {
     margin: 0;
+}
+
+hr {
+    border: none;
+    border-top: 1px solid #000000;
+    width: 100%;
+    margin: 16px 0;
 }
