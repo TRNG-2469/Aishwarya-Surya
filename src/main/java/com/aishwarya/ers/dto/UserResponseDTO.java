@@ -9,9 +9,6 @@ public class UserResponseDTO {
     private String department;
     private Role role;
 
-    public UserResponseDTO() {
-    }
-
     public UserResponseDTO(int id, String username, String department, Role role) {
         this.id = id;
         this.username = username;

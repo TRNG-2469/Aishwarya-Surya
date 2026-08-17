@@ -31,7 +31,6 @@ public class ReimbursementController {
         try {
             Reimbursement payload = ctx.bodyAsClass(Reimbursement.class);
 
-            // Always use the logged-in user's ID
             payload.setUserId(loggedInUser.getId());
 
             Reimbursement created = service.submit(payload);
@@ -103,31 +102,6 @@ public class ReimbursementController {
         } catch (IllegalArgumentException e) {
             ctx.status(400).result(e.getMessage());
         }
-    }
-
-    public static void getByUserId(Context ctx) {
-        String idParam = ctx.pathParamMap().containsKey("id") ? ctx.pathParam("id") : ctx.pathParam("userId");
-        int targetUserId = Integer.parseInt(idParam);
-        UserResponseDTO loggedInUser = ctx.sessionAttribute("currentUser");
-        if (loggedInUser == null) {
-            ctx.status(401).result("Not logged in");
-            return;
-        }
-
-        List<Reimbursement> reimbursements = service.getByUserId(targetUserId, loggedInUser.getId());
-        if (reimbursements.isEmpty()) {
-            ctx.status(200).result("No reimbursements found");
-            return;
-        }
-        ctx.json(reimbursements);
-    }
-
-    public void getByStatus(Context ctx) {
-        ReimbursementStatus status = ReimbursementStatus.valueOf(
-                ctx.pathParam("status").toUpperCase()
-        );
-        List<Reimbursement> reimbursements = service.getByStatus(status);
-        ctx.json(reimbursements);
     }
 
     public static void updatePending(Context ctx) {
