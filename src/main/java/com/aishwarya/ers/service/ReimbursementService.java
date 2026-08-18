@@ -47,7 +47,7 @@ public class ReimbursementService {
 
     public Reimbursement getById(int id) {
         Reimbursement r = repo.findById(id);
-        if (r == null) throw new ReimbursementNotFoundException("No reimbursement with id " + id);
+        if (r == null) throw new ReimbursementNotFoundException(id);
         return r;
     }
 
@@ -119,7 +119,7 @@ public class ReimbursementService {
         Reimbursement reimbursement = repo.findById(id);
 
         if (reimbursement == null) {
-            throw new ReimbursementNotFoundException("No reimbursement with id " + id);
+            throw new ReimbursementNotFoundException(id);
         }
 
         if (reimbursement.getUserId() == resolverId) {
