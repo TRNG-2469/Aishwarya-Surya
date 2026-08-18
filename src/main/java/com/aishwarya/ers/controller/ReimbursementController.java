@@ -4,8 +4,6 @@ import com.aishwarya.ers.dto.UserResponseDTO;
 import com.aishwarya.ers.model.Reimbursement;
 import com.aishwarya.ers.model.ReimbursementStatus;
 import com.aishwarya.ers.model.Role;
-import com.aishwarya.ers.repository.ReimbursementRepository;
-import com.aishwarya.ers.repository.UserRepository;
 import com.aishwarya.ers.service.ReimbursementService;
 import com.aishwarya.ers.exception.ForbiddenException;
 import io.javalin.http.Context;
@@ -14,13 +12,13 @@ import java.util.List;
 
 public class ReimbursementController {
 
-    private static ReimbursementService service = new ReimbursementService(new ReimbursementRepository(), new UserRepository());
+    private final ReimbursementService service;
 
     public ReimbursementController(ReimbursementService service) {
         this.service = service;
     }
 
-    public static void submit(Context ctx) {
+    public void submit(Context ctx) {
         UserResponseDTO loggedInUser = ctx.sessionAttribute("currentUser");
 
         if (loggedInUser == null) {
@@ -30,11 +28,8 @@ public class ReimbursementController {
 
         try {
             Reimbursement payload = ctx.bodyAsClass(Reimbursement.class);
-
             payload.setUserId(loggedInUser.getId());
-
             Reimbursement created = service.submit(payload);
-
             ctx.status(201).json(created);
 
         } catch (IllegalArgumentException e) {
@@ -44,7 +39,7 @@ public class ReimbursementController {
         }
     }
 
-    public static void getFiltered(Context ctx) {
+    public void getFiltered(Context ctx) {
         UserResponseDTO loggedInUser = ctx.sessionAttribute("currentUser");
 
         if (loggedInUser == null) {
@@ -76,7 +71,7 @@ public class ReimbursementController {
         }
     }
 
-    public static void getById(Context ctx) {
+    public void getById(Context ctx) {
         UserResponseDTO loggedInUser = ctx.sessionAttribute("currentUser");
 
         if (loggedInUser == null) {
@@ -104,7 +99,7 @@ public class ReimbursementController {
         }
     }
 
-    public static void updatePending(Context ctx) {
+    public void updatePending(Context ctx) {
         UserResponseDTO loggedInUser = ctx.sessionAttribute("currentUser");
 
         if (loggedInUser == null) {
@@ -130,7 +125,8 @@ public class ReimbursementController {
             ctx.status(400).result(e.getMessage());
         }
     }
-    public static void approve(Context ctx) {
+
+    public void approve(Context ctx) {
         UserResponseDTO loggedInUser = ctx.sessionAttribute("currentUser");
 
         if (loggedInUser == null) {
@@ -154,7 +150,7 @@ public class ReimbursementController {
         }
     }
 
-    public static void deny(Context ctx) {
+    public void deny(Context ctx) {
         UserResponseDTO loggedInUser = ctx.sessionAttribute("currentUser");
 
         if (loggedInUser == null) {
@@ -178,7 +174,7 @@ public class ReimbursementController {
         }
     }
 
-    public static void getAll(Context ctx) {
+    public void getAll(Context ctx) {
         UserResponseDTO loggedInUser = ctx.sessionAttribute("currentUser");
         if (loggedInUser == null) {
             ctx.status(401).result("Not logged in");
@@ -196,7 +192,8 @@ public class ReimbursementController {
         }
         ctx.json(reimbursements);
     }
-    public static void getByUserIdAndStatus(Context ctx) {
+
+    public void getByUserIdAndStatus(Context ctx) {
         UserResponseDTO loggedInUser = ctx.sessionAttribute("currentUser");
 
         if (loggedInUser == null) {

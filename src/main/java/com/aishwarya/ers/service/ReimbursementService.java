@@ -73,6 +73,7 @@ public class ReimbursementService {
         return repo.findByStatus(status);
     }
 
+    // only let the managers view all reimbursements
     public List<Reimbursement> getByFilters(int callerId, ReimbursementStatus status, String department) {
         User caller = userRepo.findById(callerId);
 
