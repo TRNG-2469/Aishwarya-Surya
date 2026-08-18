@@ -126,50 +126,36 @@ public class ReimbursementController {
         }
     }
 
-    public void approve(Context ctx) {
+    public void approveOrDeny(Context ctx) {
         UserResponseDTO loggedInUser = ctx.sessionAttribute("currentUser");
-
         if (loggedInUser == null) {
             ctx.status(401).result("Not logged in");
             return;
         }
-
         try {
-            int id = Integer.parseInt(ctx.pathParam("id"));
-
-            service.approve(id, loggedInUser.getId());
-
+            int reimbursementId = Integer.parseInt(ctx.pathParam("reimbursementId"));
+            if (loggedInUser.getRole() != Role.MANAGER) {
+                ctx.status(403).result("Forbidden: This person is not a manager");
+                return;
+            }
+            Reimbursement payload = ctx.bodyAsClass(Reimbursement.class);
+            if (payload.getStatus() == ReimbursementStatus.APPROVED) {
+                service.approve(reimbursementId, loggedInUser.getId());
+            } else if (payload.getStatus() == ReimbursementStatus.DENIED) {
+                service.deny(reimbursementId, loggedInUser.getId());
+            } else if (payload.getStatus() == ReimbursementStatus.PENDING) {
+                ctx.status(400).result("Cannot approve/deny pending reimbursement");
+                return;
+            } else {
+                ctx.status(400).result("Cannot approve reimbursement");
+                return;
+            }
             ctx.status(204);
-
-        } catch (NumberFormatException e) {
-            ctx.status(400).result("Invalid reimbursement ID");
-        } catch (ForbiddenException e) {
+        } catch (NumberFormatException e){
+            ctx.status(400).result("Invalid ID format");
+        } catch (ForbiddenException e){
             ctx.status(403).result(e.getMessage());
-        } catch (RuntimeException e) {
-            ctx.status(400).result(e.getMessage());
-        }
-    }
-
-    public void deny(Context ctx) {
-        UserResponseDTO loggedInUser = ctx.sessionAttribute("currentUser");
-
-        if (loggedInUser == null) {
-            ctx.status(401).result("Not logged in");
-            return;
-        }
-
-        try {
-            int id = Integer.parseInt(ctx.pathParam("id"));
-
-            service.deny(id, loggedInUser.getId());
-
-            ctx.status(204);
-
-        } catch (NumberFormatException e) {
-            ctx.status(400).result("Invalid reimbursement ID");
-        } catch (ForbiddenException e) {
-            ctx.status(403).result(e.getMessage());
-        } catch (RuntimeException e) {
+        } catch (Exception e){
             ctx.status(400).result(e.getMessage());
         }
     }
