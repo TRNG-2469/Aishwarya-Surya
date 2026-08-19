@@ -143,11 +143,8 @@ public class ReimbursementController {
                 service.approve(reimbursementId, loggedInUser.getId());
             } else if (payload.getStatus() == ReimbursementStatus.DENIED) {
                 service.deny(reimbursementId, loggedInUser.getId());
-            } else if (payload.getStatus() == ReimbursementStatus.PENDING) {
-                ctx.status(400).result("Cannot approve/deny pending reimbursement");
-                return;
             } else {
-                ctx.status(400).result("Cannot approve reimbursement");
+                ctx.status(400).result("Cannot approve/deny reimbursement");
                 return;
             }
             ctx.status(204);
